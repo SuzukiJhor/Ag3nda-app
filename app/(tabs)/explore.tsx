@@ -30,7 +30,7 @@ export default function ClientesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
+  container: { flex: 1, padding: 20, backgroundColor: '#fff', paddingTop: 54 },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 16, textAlign: 'center' },
   card: { backgroundColor: '#f1f1f1', padding: 16, borderRadius: 8, marginBottom: 12 },
   nome: { fontSize: 18, fontWeight: '600' },
