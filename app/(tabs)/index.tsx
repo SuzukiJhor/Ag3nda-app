@@ -2,11 +2,13 @@ import React from 'react';
 import { FlatList, StyleSheet, Text, View, Button } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { reservas as reservasMock } from '../mock/reservation';
+import {  useRouter } from 'expo-router';
 import '../config/calendarLocale';
 
 export default function AgendaScreen() {
   const [selected, setSelected] = React.useState('');
   const [reservas, setReservas] = React.useState(reservasMock);
+  const router = useRouter();
 
   const reservasDoDia = reservas.filter(r => r.data === selected);
 
@@ -23,21 +25,22 @@ export default function AgendaScreen() {
 
   const handleAdicionarReserva = () => {
     if (!selected) return;
+    router.push({ pathname: '/new-reservation', params: { data: selected } });
 
-    const novaReserva = {
-      id: Date.now().toString(), 
-      data: selected,
-      cliente: 'Novo Cliente',
-      servico: 'Serviço Padrão',
-      status: 'pendente',
-      observacoes: '',
-      nome: 'Nome Exemplo',
-      email: 'email@example.com',
-      telefone: '(00) 00000-0000',
-      documento: '000.000.000-00'
-    };
+    // const novaReserva = {
+    //   id: Date.now().toString(), 
+    //   data: selected,
+    //   cliente: 'Novo Cliente',
+    //   servico: 'Serviço Padrão',
+    //   status: 'pendente',
+    //   observacoes: '',
+    //   nome: 'Nome Exemplo',
+    //   email: 'email@example.com',
+    //   telefone: '(00) 00000-0000',
+    //   documento: '000.000.000-00'
+    // };
 
-    setReservas(prev => [...prev, novaReserva]);
+    // setReservas(prev => [...prev, novaReserva]);
   };
 
   return (
