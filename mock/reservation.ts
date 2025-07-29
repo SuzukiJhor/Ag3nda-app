@@ -2,7 +2,6 @@ export const reservas = [
   {
     id: '1',
     data: '2025-07-28',
-    cliente: 'Maria',
     servico: 'Consulta',
     status: 'confirmada',
     observacoes: 'Cliente preferiu horário da manhã',
@@ -14,7 +13,6 @@ export const reservas = [
   {
     id: '2',
     data: '2025-07-28',
-    cliente: 'João',
     servico: 'Retorno',
     status: 'pendente',
     observacoes: '',
@@ -26,7 +24,6 @@ export const reservas = [
   {
     id: '3',
     data: '2025-07-29',
-    cliente: 'Ana',
     servico: 'Consulta',
     status: 'confirmada',
     observacoes: 'Levar documentos médicos',
@@ -38,7 +35,6 @@ export const reservas = [
   {
     id: '4',
     data: '2025-07-29',
-    cliente: 'Carlos',
     servico: 'Limpeza',
     status: 'cancelada',
     observacoes: 'Cancelou por motivo de força maior',
@@ -50,7 +46,6 @@ export const reservas = [
   {
     id: '5',
     data: '2025-07-30',
-    cliente: 'Fernanda',
     servico: 'Exame',
     status: 'confirmada',
     observacoes: '',
@@ -62,7 +57,6 @@ export const reservas = [
   {
     id: '6',
     data: '2025-07-30',
-    cliente: 'Ricardo',
     servico: 'Retorno',
     status: 'pendente',
     observacoes: 'Primeira consulta foi em 15/07',
@@ -74,7 +68,6 @@ export const reservas = [
   {
     id: '7',
     data: '2025-07-31',
-    cliente: 'Paula',
     servico: 'Consulta',
     status: 'confirmada',
     observacoes: '',

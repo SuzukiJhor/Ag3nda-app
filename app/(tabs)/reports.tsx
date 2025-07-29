@@ -1,6 +1,6 @@
 import React from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
-import { reservas as reservasMock } from '../mock/reservation';
+import { reservas as reservasMock } from '../../mock/reservation';
 
 
 export default function RelatoriosScreen() {

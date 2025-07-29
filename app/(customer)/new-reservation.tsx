@@ -1,21 +1,22 @@
+import { db } from '@/firebase';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { addDoc, collection } from 'firebase/firestore';
 import React from 'react';
 import {
-  View,
+  Button,
+  ScrollView,
+  StyleSheet,
   Text,
   TextInput,
-  Button,
-  StyleSheet,
-  ScrollView,
   TouchableOpacity,
+  View,
 } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
 
 type FormData = {
   nome: string;
   email: string;
   telefone: string;
   documento: string;
-  cliente: string;
   servico: string;
   status: string;
   observacoes: string;
@@ -30,7 +31,6 @@ export default function NewReservationScreen() {
     email: '',
     telefone: '',
     documento: '',
-    cliente: '',
     servico: '',
     status: '',
     observacoes: '',
@@ -40,15 +40,27 @@ export default function NewReservationScreen() {
     setForm(prev => ({ ...prev, [field]: value }));
   }, []);
 
-  const salvarReserva = () => {
-    const novaReserva = {
+  function handleGoBack() {
+     try {
+      router.back();
+    } catch {
+      router.replace('/(tabs)');
+    }
+  }
+  const addReservation = async () => {
+    const newReservation = {
       id: Date.now().toString(),
       data,
       ...form,
     };
-
-    console.log('Nova reserva:', novaReserva);
-    router.back();
+    try {
+      await addDoc(collection(db, 'reservas'), newReservation);
+      handleGoBack();
+    } catch (error) {
+      console.error('Erro ao salvar reserva:', error);
+    }
+    console.log(newReservation);
+    return;
   };
 
   const capitalize = (text: string) =>
@@ -126,7 +138,8 @@ export default function NewReservationScreen() {
         onChangeText={value => onChange('observacoes', value)}
       />
 
-      <Button title="Salvar reserva" onPress={salvarReserva} />
+      <Button title="Salvar reserva" onPress={addReservation} />
+
     </ScrollView>
   );
 }
