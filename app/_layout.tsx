@@ -25,6 +25,10 @@ export default function RootLayout() {
           headerTitle: '',
           headerShown: true,
         }}/>
+        <Stack.Screen name="(customer)/update-reservation" options={{
+          headerTitle: '',
+          headerShown: true,
+        }} />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />

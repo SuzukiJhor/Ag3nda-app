@@ -1,7 +1,7 @@
 import '@/config/calendarLocale';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Button, FlatList, StyleSheet, Text, View } from 'react-native';
+import { Button, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { reservas as reservasMock } from '../../mock/reservation';
 
@@ -25,12 +25,19 @@ export default function AgendaScreen() {
 
   const getStatusStyle = (status: string) => {
     if (status === 'pendente') return styles.cardPendente;
-    if (status === 'confirmada') return styles.cardConfirmada;
-    if (status === 'cancelada') return styles.cardCancelada;
+    if (status === 'confirmado') return styles.cardConfirmada;
+    if (status === 'cancelado') return styles.cardCancelada;
     return styles.card;
   };
 
-  const handleAddReservation = async () => {
+  const handleEditReservation = (item: any) => {
+  router.push({
+    pathname: '/update-reservation',
+    params: { ...item }
+  });
+};
+
+  const handleAddReservation = () => {
     if (!selected) return;
     return router.push({ pathname: '/new-reservation', params: { data: selected } });
   };
@@ -45,17 +52,19 @@ export default function AgendaScreen() {
       <Text style={styles.label}>Agendamentos do dia:</Text>
 
        <FlatList
-        data={reservasDoDia}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <View style={[styles.card, getStatusStyle(item.status)]}>
-            <Text>{item.nome}</Text>
-            <Text>{item.telefone}</Text>
-            <Text>{item.status}</Text>
-          </View>
-        )}
-        ListEmptyComponent={<Text style={styles.empty}>Nenhum compromisso nesse dia</Text>}
-      />
+          data={reservasDoDia}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => handleEditReservation(item)}>
+              <View style={[styles.card, getStatusStyle(item.status)]}>
+                <Text>{item.nome}</Text>
+                <Text>{item.telefone}</Text>
+                <Text>{item.status}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+          ListEmptyComponent={<Text style={styles.empty}>Nenhum compromisso nesse dia</Text>}
+        />
 
       <Button style={styles.buttonText} title="+ Nova Reserva" onPress={handleAddReservation} disabled={!selected} />
     </View>
