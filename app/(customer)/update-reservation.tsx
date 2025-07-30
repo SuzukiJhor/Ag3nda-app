@@ -1,9 +1,8 @@
+import { db } from '@/firebase';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import React from 'react';
 import { Button, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-// Importe o Firestore se for salvar no banco
-// import { db } from '@/firebase';
-// import { doc, updateDoc } from 'firebase/firestore';
 
 type FormData = {
   nome: string;
@@ -48,23 +47,32 @@ export default function UpdateClientScreen() {
     text.charAt(0).toUpperCase() + text.slice(1);
 
     const handleCancelReservation = async () => {
-    // Atualiza o status local
-    setForm(prev => ({ ...prev, status: 'cancelado' }));
-
-    // Se quiser salvar no banco, descomente:
-    // const ref = doc(db, 'clientes', params.id as string);
-    // await updateDoc(ref, { ...form, status: 'cancelado' });
-
-    // Volta para a tela anterior
-    router.back();
+      if (!params.id) {
+        alert('ID da reserva não encontrado!');
+        return;
+      }
+        const ref = doc(db, 'reservas', String(params.id));
+        console.log('Tentando buscar reserva:', params.id);
+        const snap = await getDoc(ref);
+        if (!snap.exists()) {
+          alert('Reserva não encontrada!');
+          return;
+        }
+      try {
+        await updateDoc(ref, { ...form, status: 'cancelado' });
+        router.back();
+      } catch (error) {
+        console.error('Erro ao cancelar reserva:', error);
+        alert('Erro ao cancelar reserva!');
+      }
     };
 
     const handleUpdate = async () => {
     // Exemplo para atualizar no Firestore:
-    // const ref = doc(db, 'clientes', id as string);
+    // const ref = doc(db, 'reservas', id as string);
     // await updateDoc(ref, form);
     console.log(form);
-    // Volta para a tela anterior ou lista de clientes
+    // Volta para a tela anterior ou lista de reservas
     // router.back();
   };
 

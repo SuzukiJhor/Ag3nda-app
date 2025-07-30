@@ -1,16 +1,28 @@
 import '@/config/calendarLocale';
+import { db } from '@/firebase';
 import { useRouter } from 'expo-router';
+import { collection, onSnapshot } from 'firebase/firestore';
 import React from 'react';
 import { Button, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Calendar } from 'react-native-calendars';
-import { reservas as reservasMock } from '../../mock/reservation';
 
 export default function AgendaScreen() {
   const [selected, setSelected] = React.useState('');
-  const [reservas] = React.useState(reservasMock);
+  const [reservas, setReservas] = React.useState<any[]>([]);
   const router = useRouter();
-
   const reservasDoDia = reservas.filter(r => r.data === selected);
+
+  React.useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'reservas'), (snapshot) => {
+      const data = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setReservas(data);
+      });
+
+    return () => unsubscribe();
+  }, []);
 
   const markedDates = React.useMemo(() => {
     const result: Record<string, { marked?: boolean; dotColor?: string; selected?: boolean; selectedColor?: string }> = {};
