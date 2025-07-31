@@ -1,3 +1,5 @@
+import CreateReservationButton from '@/components/button/ButtonCreateNewReservation';
+import { TitleSubtitle } from '@/components/button/TitleSubtitle';
 import '@/config/calendarLocale';
 import { db } from '@/firebase';
 import { Ionicons } from '@expo/vector-icons'; // para o ícone de engrenagem
@@ -59,13 +61,14 @@ export default function AgendaScreen() {
 
   const handleAddReservation = () => {
     if (!selected) return;
-    router.push({ pathname: '/new-reservation', params: { data: selected } });
+    router.push({ pathname: '/newReservation', params: { data: selected } });
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Espaço de Lazer</Text>
+  
+        <TitleSubtitle title="Recanto Suzuki"/>
         <TouchableOpacity style={styles.settingsButton} onPress={() => {/* ação de configurações */}}>
           <Ionicons name="settings" size={24} color="white" />
         </TouchableOpacity>
@@ -92,9 +95,11 @@ export default function AgendaScreen() {
         </View>
       )}
 
-      <TouchableOpacity style={styles.novaReservaButton} onPress={handleAddReservation} disabled={!selected}>
-        <Text style={styles.novaReservaText}>+ Nova Reserva</Text>
-      </TouchableOpacity>
+      <CreateReservationButton
+        title="+ Nova Reserva"
+        onPress={handleAddReservation}
+        disabled={!selected}
+      />
 
       <View style={styles.proximasDatasCard}>
         <Text style={styles.labelPequeno}>Próximas datas</Text>
@@ -113,7 +118,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: '#fff', paddingTop: 54 },
 
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
-  title: { fontWeight: 'bold', fontSize: 28 },
   settingsButton: {
     backgroundColor: '#007AFF',
     padding: 8,
@@ -164,13 +168,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 
-  novaReservaButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 16,
-    borderRadius: 12,
-    marginBottom: 24,
-    alignItems: 'center',
-  },
   novaReservaText: {
     color: 'white',
     fontWeight: 'bold',

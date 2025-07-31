@@ -1,16 +1,16 @@
+import CreateReservationButton from '@/components/button/ButtonCreateNewReservation';
 import { db } from '@/firebase';
 import { useHandleGoBack } from '@/hooks/useHandleGoBack';
 import { useLocalSearchParams } from 'expo-router';
 import { addDoc, collection } from 'firebase/firestore';
 import React from 'react';
 import {
-  Button,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 
 type FormData = {
@@ -132,7 +132,11 @@ const capitalize = (text: string) =>
         onChangeText={value => onChange('observacoes', value)}
       />
 
-      <Button title="Salvar reserva" onPress={addReservation} />
+      <CreateReservationButton
+          title="Salvar reservaa"
+          onPress={addReservation}
+          disabled={false}
+      />
 
     </ScrollView>
   );

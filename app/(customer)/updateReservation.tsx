@@ -1,9 +1,11 @@
+import DangerButton from '@/components/button/ButtonCancelReservation';
+import CreateReservationButton from '@/components/button/ButtonCreateNewReservation';
 import { db } from '@/firebase';
 import { useHandleGoBack } from '@/hooks/useHandleGoBack';
 import { useLocalSearchParams } from 'expo-router';
 import { collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import React from 'react';
-import { Button, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { FormData, statusOptions } from '../types/form';
 
 export default function UpdateClientScreen() {
@@ -148,13 +150,21 @@ export default function UpdateClientScreen() {
         onChangeText={value => onChange('observacoes', value)}
       />
 
-      <Button title="Salvar alterações" onPress={handleUpdate} />
-      <View style={{ height: 16 }} />
-      <Button
+    <CreateReservationButton
+        title="Salvar alterações"
+        onPress={handleUpdate}
+        disabled={false}
+    />
+
+    <View style={{ height: 8 }} />
+
+    <DangerButton
         title="Cancelar reserva"
-        color="#ff4d4d"
         onPress={handleCancelReservation}
-        />
+        disabled={false}
+    />
+
+
     </ScrollView>
   );
 }

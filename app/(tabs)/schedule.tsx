@@ -1,9 +1,11 @@
+import CreateReservationButton from '@/components/button/ButtonCreateNewReservation';
+import { TitleSubtitle } from '@/components/button/TitleSubtitle';
 import '@/config/calendarLocale';
 import { db } from '@/firebase';
 import { useRouter } from 'expo-router';
 import { collection, onSnapshot } from 'firebase/firestore';
 import React from 'react';
-import { Button, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 
 export default function AgendaScreen() {
@@ -44,14 +46,14 @@ export default function AgendaScreen() {
 
   const handleEditReservation = (item: any) => {
   router.push({
-    pathname: '/update-reservation',
+    pathname: '/updateReservation',
     params: { ...item }
   });
 };
 
   const handleAddReservation = () => {
     if (!selected) return;
-    return router.push({ pathname: '/new-reservation', params: { data: selected } });
+    return router.push({ pathname: '/newReservation', params: { data: selected } });
   };
 
 
@@ -61,7 +63,8 @@ export default function AgendaScreen() {
         markedDates={markedDates}
         onDayPress={day => setSelected(day.dateString)}
       />
-      <Text style={styles.label}>Agendamentos do dia:</Text>
+      
+      <TitleSubtitle subtitle="Agendamentos do dia"/>
 
        <FlatList
           data={reservasDoDia}
@@ -77,8 +80,11 @@ export default function AgendaScreen() {
           )}
           ListEmptyComponent={<Text style={styles.empty}>Nenhum compromisso nesse dia</Text>}
         />
-
-      <Button style={styles.buttonText} title="+ Nova Reserva" onPress={handleAddReservation} disabled={!selected} />
+      <CreateReservationButton
+        title="+ Nova Reserva"
+        onPress={handleAddReservation}
+        disabled={!selected}
+      />
     </View>
   );
 }
@@ -98,5 +104,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 16,
   },
-  buttonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
 });
