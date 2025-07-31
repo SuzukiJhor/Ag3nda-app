@@ -1,6 +1,8 @@
 import CreateReservationButton from '@/components/button/ButtonCreateNewReservation';
+import { TitleSubtitle } from '@/components/button/TitleSubtitle';
 import { db } from '@/firebase';
 import { useHandleGoBack } from '@/hooks/useHandleGoBack';
+import { normalizeDate } from '@/utils/normalizeDate';
 import { useLocalSearchParams } from 'expo-router';
 import { addDoc, collection } from 'firebase/firestore';
 import React from 'react';
@@ -69,8 +71,8 @@ const capitalize = (text: string) =>
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.label}>Data da reserva: {data}</Text>
-
+      <TitleSubtitle title="Data da reserva: "/>
+      <TitleSubtitle subtitle= {normalizeDate(new Date(data)).toLocaleDateString()}/>
       <Text style={styles.sectionTitle}>Dados do Cliente</Text>
       <TextInput
         style={styles.input}
@@ -133,7 +135,7 @@ const capitalize = (text: string) =>
       />
 
       <CreateReservationButton
-          title="Salvar reservaa"
+          title="Salvar reserva"
           onPress={addReservation}
           disabled={false}
       />
@@ -146,7 +148,6 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     backgroundColor: '#fff',
-    paddingTop: 54,
     flexGrow: 1,
   },
   label: {

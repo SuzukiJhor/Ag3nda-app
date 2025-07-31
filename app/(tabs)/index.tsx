@@ -2,16 +2,48 @@ import CreateReservationButton from '@/components/button/ButtonCreateNewReservat
 import { TitleSubtitle } from '@/components/button/TitleSubtitle';
 import '@/config/calendarLocale';
 import { db } from '@/firebase';
-import { Ionicons } from '@expo/vector-icons'; // para o ícone de engrenagem
+import { getTodayFormatted } from '@/utils/getTodayFormatted';
+import { normalizeDate } from '@/utils/normalizeDate';
+import { formatarData, parseLocalDate } from '@/utils/parseLocalDate';
+import { today } from '@/utils/todayDate';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { collection, onSnapshot } from 'firebase/firestore';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function AgendaScreen() {
-  const [selected, setSelected] = React.useState('');
+  const [selected] = React.useState(getTodayFormatted());
   const [reservas, setReservas] = React.useState<any[]>([]);
   const router = useRouter();
+
+  const todaySchedules = React.useMemo(() => {
+    return reservas.filter(r => {
+      const reservaDate = parseLocalDate(r.data);
+      return normalizeDate(reservaDate).getTime() === today.getTime();
+    });
+  }, [reservas]);
+
+  const nextDates = React.useMemo(() => {
+    const dias = [];
+    for (let i = 1; i <= 3; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      const dataStr = d.toISOString().slice(0, 10);
+     const reservationsOnTheDay = reservas.filter(r => r.data === dataStr && r.status !== 'cancelado' && r.status !== 'expirado'); 
+      dias.push({
+        data: d,
+        status: reservationsOnTheDay.length > 0 ? 'Ocupado' : 'Livre',
+      });
+    }
+    return dias;
+  }, [reservas]);
+
+  const handleAddReservation = () => {
+    console.log('selected', selected);
+     if (!selected) return;
+    return router.push({ pathname: '/newReservation', params: { data: selected } });
+  };
 
   React.useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'reservas'), (snapshot) => {
@@ -25,85 +57,49 @@ export default function AgendaScreen() {
     return () => unsubscribe();
   }, []);
 
-  // Filtra reservas do dia selecionado
-  const reservasDoDia = reservas.filter(r => r.data === selected);
-
-  // Pega a próxima reserva com status confirmado ou pendente
-  const proximaReserva = React.useMemo(() => {
-    // ordenar por data crescente
-    const futuras = reservas
-      .filter(r => new Date(r.data) >= new Date())
-      .sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime());
-    return futuras.length > 0 ? futuras[0] : null;
-  }, [reservas]);
-
-  // Próximas datas com status livre ou ocupado (simples)
-  const proximasDatas = React.useMemo(() => {
-    // criar lista dos próximos 3 dias a partir de hoje (exemplo fixo)
-    const dias = [];
-    const hoje = new Date();
-    for (let i = 1; i <= 3; i++) {
-      const d = new Date(hoje);
-      d.setDate(hoje.getDate() + i);
-      const dataStr = d.toISOString().slice(0, 10);
-      const reservaNoDia = reservas.find(r => r.data === dataStr);
-      dias.push({
-        data: d,
-        status: reservaNoDia ? 'Ocupado' : 'Livre',
-      });
-    }
-    return dias;
-  }, [reservas]);
-
-  const formatarData = (date: Date) => {
-    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' });
-  };
-
-  const handleAddReservation = () => {
-    if (!selected) return;
-    router.push({ pathname: '/newReservation', params: { data: selected } });
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-  
-        <TitleSubtitle title="Recanto Suzuki"/>
-        <TouchableOpacity style={styles.settingsButton} onPress={() => {/* ação de configurações */}}>
+        <TitleSubtitle title="Recanto Suzuki" />
+        <TouchableOpacity style={styles.settingsButton} onPress={() => {}}>
           <Ionicons name="settings" size={24} color="white" />
         </TouchableOpacity>
       </View>
 
-      {proximaReserva ? (
-        <View style={styles.proximaReservaCard}>
-          <Text style={styles.labelPequeno}>Próxima reserva</Text>
-          <View style={styles.proximaReservaRow}>
+    {todaySchedules.length > 0 ? (
+      <View style={styles.proximaReservaCard}>
+        <TitleSubtitle subtitle="Agendamentos para Hoje" />
+        {todaySchedules.map((reserva, index) => (
+          <View style={styles.proximaReservaRow} key={reserva.id ?? index}>
             <View>
-              <Text style={styles.nomeReserva}>{proximaReserva.nome}</Text>
-              <Text style={styles.dataReserva}>{formatarData(new Date(proximaReserva.data))} de {new Date(proximaReserva.data).getFullYear()}</Text>
+              <Text style={styles.nomeReserva}>{reserva.nome}</Text>
+              <Text style={styles.dataReserva}>
+                {formatarData(parseLocalDate(reserva.data))} de {parseLocalDate(reserva.data).getFullYear()}
+              </Text>
             </View>
             <View style={styles.iconCalendar}>
               <Text style={styles.iconCalendarText}>
-                {new Date(proximaReserva.data).getDate()}
+                {parseLocalDate(reserva.data).getDate()}
               </Text>
             </View>
           </View>
-        </View>
-      ) : (
-        <View style={[styles.proximaReservaCard, {justifyContent: 'center', alignItems: 'center'}]}>
-          <Text style={{ color: '#666' }}>Sem reservas futuras</Text>
-        </View>
-      )}
+        ))}
+      </View>
+    ) : (
+      <View style={[styles.proximaReservaCard, { justifyContent: 'center', alignItems: 'center' }]}>
+         <TitleSubtitle subtitle="Nenhum agendamento para hoje" />
+      </View>
+    )}
 
       <CreateReservationButton
         title="+ Nova Reserva"
         onPress={handleAddReservation}
-        disabled={!selected}
+        disabled={false}
       />
 
       <View style={styles.proximasDatasCard}>
-        <Text style={styles.labelPequeno}>Próximas datas</Text>
-        {proximasDatas.map((item, index) => (
+        <TitleSubtitle subtitle="Próximas datas:" />
+        {nextDates.map((item, index) => (
           <View style={styles.dataStatusRow} key={index}>
             <Text>{formatarData(item.data)}</Text>
             <Text style={{ color: item.status === 'Livre' ? 'green' : 'red' }}>{item.status}</Text>
@@ -116,14 +112,12 @@ export default function AgendaScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: '#fff', paddingTop: 54 },
-
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   settingsButton: {
     backgroundColor: '#007AFF',
     padding: 8,
     borderRadius: 20,
   },
-
   proximaReservaCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
@@ -135,15 +129,12 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     elevation: 3,
   },
-  labelPequeno: {
-    fontWeight: '600',
-    fontSize: 14,
-    marginBottom: 8,
-  },
   proximaReservaRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 16,
+    marginTop: 12,
   },
   nomeReserva: {
     fontWeight: 'bold',
@@ -153,7 +144,6 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 4,
   },
-
   iconCalendar: {
     backgroundColor: '#007AFF',
     width: 48,
@@ -167,13 +157,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 18,
   },
-
-  novaReservaText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 18,
-  },
-
   proximasDatasCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
