@@ -1,33 +1,18 @@
 import { db } from '@/firebase';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { useHandleGoBack } from '@/hooks/useHandleGoBack';
+import { useLocalSearchParams } from 'expo-router';
+import { collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import React from 'react';
 import { Button, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-
-type FormData = {
-  nome: string;
-  email: string;
-  telefone: string;
-  documento: string;
-  servico: string;
-  status: string;
-  observacoes: string;
-};
+import { FormData, statusOptions } from '../types/form';
 
 export default function UpdateClientScreen() {
-  const router = useRouter();
+  const handleGoBack = useHandleGoBack({ fallbackRoute: "/(tabs)" });
   const params = useLocalSearchParams();
   const getParamString = (param: string | string[] | undefined) => {
     if (Array.isArray(param)) return param[0] || '';
     return param || '';
   };
-
-    const statusOptions: FormData['status'][] = [
-    'pendente',
-    'confirmado',
-    'cancelado',
-    'expirado',
-    ];
    
   const [form, setForm] = React.useState<FormData>({
     nome: getParamString(params.nome),
@@ -43,37 +28,60 @@ export default function UpdateClientScreen() {
     setForm(prev => ({ ...prev, [field]: value }));
   };
 
-    const capitalize = (text: string) =>
-    text.charAt(0).toUpperCase() + text.slice(1);
+  const capitalize = (text: string) =>
+  text.charAt(0).toUpperCase() + text.slice(1);
 
-    const handleCancelReservation = async () => {
-      if (!params.id) {
-        alert('ID da reserva não encontrado!');
+  async function getReservaRefById(idInterno: string) {
+    const reservasCol = collection(db, "reservas");
+    const q = query(reservasCol, where("id", "==", idInterno));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      return null;
+    }
+
+    const docSnap = querySnapshot.docs[0];
+    const documentId = docSnap.id;
+    return doc(db, "reservas", documentId);
+  }
+
+  
+  
+  const handleCancelReservation = async () => {
+    const rawId = Array.isArray(params.id) ? params.id[0] : params.id;
+    const idInterno = (rawId || "").trim();
+
+    try {
+      const reservaRef = await getReservaRefById(idInterno);
+      if (!reservaRef) {
+        alert("Reserva não encontrada com esse ID interno.");
         return;
       }
-        const ref = doc(db, 'reservas', String(params.id));
-        console.log('Tentando buscar reserva:', params.id);
-        const snap = await getDoc(ref);
-        if (!snap.exists()) {
-          alert('Reserva não encontrada!');
-          return;
-        }
-      try {
-        await updateDoc(ref, { ...form, status: 'cancelado' });
-        router.back();
-      } catch (error) {
-        console.error('Erro ao cancelar reserva:', error);
-        alert('Erro ao cancelar reserva!');
-      }
-    };
+      await updateDoc(reservaRef, { status: "cancelado" });
+      handleGoBack();
+    } catch (err) {
+      console.error("Erro ao cancelar reserva:", err);
+      alert("Erro ao cancelar reserva!");
+    }
+  };
 
-    const handleUpdate = async () => {
-    // Exemplo para atualizar no Firestore:
-    // const ref = doc(db, 'reservas', id as string);
-    // await updateDoc(ref, form);
-    console.log(form);
-    // Volta para a tela anterior ou lista de reservas
-    // router.back();
+  const handleUpdate = async () => {
+    const rawId = Array.isArray(params.id) ? params.id[0] : params.id;
+    const idInterno = (rawId || "").trim();
+
+    try {
+      const reservaRef = await getReservaRefById(idInterno);
+      if (!reservaRef) {
+        alert("Reserva não encontrada com esse ID interno.");
+        return;
+      }
+      await updateDoc(reservaRef, { ...form });
+      alert("Reserva atualizada com sucesso!");
+      handleGoBack();
+    } catch (err) {
+      console.error("Erro ao atualizar reserva:", err);
+      alert("Erro ao atualizar reserva!");
+    }
   };
 
   return (

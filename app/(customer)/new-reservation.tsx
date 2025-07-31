@@ -1,5 +1,6 @@
 import { db } from '@/firebase';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useHandleGoBack } from '@/hooks/useHandleGoBack';
+import { useLocalSearchParams } from 'expo-router';
 import { addDoc, collection } from 'firebase/firestore';
 import React from 'react';
 import {
@@ -24,7 +25,7 @@ type FormData = {
 
 export default function NewReservationScreen() {
   const { data } = useLocalSearchParams<{ data: string }>();
-  const router = useRouter();
+  const handleGoBack = useHandleGoBack({ fallbackRoute: "/(tabs)" });
 
   const [form, setForm] = React.useState<FormData>({
     nome: '',
@@ -40,13 +41,7 @@ export default function NewReservationScreen() {
     setForm(prev => ({ ...prev, [field]: value }));
   }, []);
 
-  function handleGoBack() {
-     try {
-      router.back();
-    } catch {
-      router.replace('/(tabs)');
-    }
-  }
+
   const addReservation = async () => {
     const newReservation = {
       id: Date.now().toString(),
@@ -59,12 +54,11 @@ export default function NewReservationScreen() {
     } catch (error) {
       console.error('Erro ao salvar reserva:', error);
     }
-    console.log(newReservation);
     return;
   };
 
-  const capitalize = (text: string) =>
-    text.charAt(0).toUpperCase() + text.slice(1);
+const capitalize = (text: string) =>
+  text.charAt(0).toUpperCase() + text.slice(1);
 
   const statusOptions: FormData['status'][] = [
     'pendente',
