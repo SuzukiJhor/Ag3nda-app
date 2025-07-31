@@ -2,8 +2,10 @@ import CreateReservationButton from '@/components/button/ButtonCreateNewReservat
 import { TitleSubtitle } from '@/components/button/TitleSubtitle';
 import '@/config/calendarLocale';
 import { db } from '@/firebase';
+import { getReservaRefById } from '@/utils/getReservationRefById';
+import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot, updateDoc } from 'firebase/firestore';
 import React from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Calendar } from 'react-native-calendars';
@@ -21,19 +23,31 @@ export default function AgendaScreen() {
         ...doc.data(),
       }));
       setReservas(data);
-      });
+    });
 
     return () => unsubscribe();
   }, []);
 
   const markedDates = React.useMemo(() => {
-    const result: Record<string, { marked?: boolean; dotColor?: string; selected?: boolean; selectedColor?: string }> = {};
+    const result: Record<string, {
+      marked?: boolean;
+      dotColor?: string;
+      selected?: boolean;
+      selectedColor?: string;
+    }> = {};
+
     reservas.forEach(r => {
       result[r.data] = { marked: true, dotColor: 'red' };
     });
+
     if (selected) {
-      result[selected] = { ...(result[selected] || {}), selected: true, selectedColor: '#007AFF' };
+      result[selected] = {
+        ...(result[selected] || {}),
+        selected: true,
+        selectedColor: '#007AFF',
+      };
     }
+
     return result;
   }, [reservas, selected]);
 
@@ -44,18 +58,33 @@ export default function AgendaScreen() {
     return styles.card;
   };
 
+  const handleCancelReservation = async (id: string) => {
+    if (!id) return;
+
+    try {
+      const reservaRef = await getReservaRefById(id);
+      if (!reservaRef) {
+        alert("Reserva não encontrada com esse ID interno.");
+        return;
+      }
+      await updateDoc(reservaRef, { status: "cancelado" });
+    } catch (err) {
+      console.error("Erro ao cancelar reserva:", err);
+      alert("Erro ao cancelar reserva!");
+    }
+  };
+
   const handleEditReservation = (item: any) => {
-  router.push({
-    pathname: '/updateReservation',
-    params: { ...item }
-  });
-};
+    router.push({
+      pathname: '/updateReservation',
+      params: { ...item }
+    });
+  };
 
   const handleAddReservation = () => {
     if (!selected) return;
     return router.push({ pathname: '/newReservation', params: { data: selected } });
   };
-
 
   return (
     <View style={styles.container}>
@@ -63,23 +92,36 @@ export default function AgendaScreen() {
         markedDates={markedDates}
         onDayPress={day => setSelected(day.dateString)}
       />
-      
-      <TitleSubtitle subtitle="Agendamentos do dia"/>
 
-       <FlatList
-          data={reservasDoDia}
-          keyExtractor={item => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => handleEditReservation(item)}>
-              <View style={[styles.card, getStatusStyle(item.status)]}>
-                <Text>{item.nome}</Text>
-                <Text>{item.telefone}</Text>
-                <Text>{item.status}</Text>
-              </View>
+      <TitleSubtitle subtitle="Agendamentos do dia" />
+
+      <FlatList
+        data={reservasDoDia}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <View style={[styles.card, getStatusStyle(item.status), styles.cardRow]}>
+            <TouchableOpacity
+              style={styles.cardContent}
+              onPress={() => handleEditReservation(item)}
+            >
+              <Text>{item.nome}</Text>
+              <Text>{item.telefone}</Text>
+              <Text>{item.status}</Text>
             </TouchableOpacity>
-          )}
-          ListEmptyComponent={<Text style={styles.empty}>Nenhum compromisso nesse dia</Text>}
-        />
+
+            {item.status !== 'cancelado' && (
+              <TouchableOpacity onPress={() => handleCancelReservation(item.id)}>
+                <Feather name="trash-2" size={22} color="red" />
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+
+        ListEmptyComponent={
+          <Text style={styles.empty}>Nenhum compromisso nesse dia</Text>
+        }
+      />
+
       <CreateReservationButton
         title="+ Nova Reserva"
         onPress={handleAddReservation}
@@ -90,18 +132,56 @@ export default function AgendaScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: '#fff', paddingTop: 54 },
-  label: { fontWeight: 'bold', marginTop: 16, marginBottom: 8 },
-  card: { padding: 12, borderRadius: 8, marginBottom: 8 },
-  cardPendente: { backgroundColor: '#fffbe5', borderColor: '#ffe066', borderWidth: 1 },
-  cardConfirmada: { backgroundColor: '#e6ffed', borderColor: '#38d39f', borderWidth: 1 },
-  cardCancelada: { backgroundColor: '#ffe6e6', borderColor: '#ff4d4d', borderWidth: 1 },
-  empty: { color: '#aaa', textAlign: 'center', marginTop: 24 },
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#fff',
+    paddingTop: 54,
+  },
+  label: {
+    fontWeight: 'bold',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  card: {
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  cardPendente: {
+    backgroundColor: '#fffbe5',
+    borderColor: '#ffe066',
+    borderWidth: 1,
+  },
+  cardConfirmada: {
+    backgroundColor: '#e6ffed',
+    borderColor: '#38d39f',
+    borderWidth: 1,
+  },
+  cardCancelada: {
+    backgroundColor: '#ffe6e6',
+    borderColor: '#ff4d4d',
+    borderWidth: 1,
+  },
+  empty: {
+    color: '#aaa',
+    textAlign: 'center',
+    marginTop: 24,
+  },
   button: {
     backgroundColor: '#007AFF',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 16,
+  },
+  cardRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  cardContent: {
+    flex: 1,
+    gap: 4,
   },
 });

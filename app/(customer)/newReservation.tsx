@@ -14,6 +14,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { TextInputMask } from 'react-native-masked-text';
 
 type FormData = {
   nome: string;
@@ -43,8 +44,23 @@ export default function NewReservationScreen() {
     setForm(prev => ({ ...prev, [field]: value }));
   }, []);
 
+  function validateForm() {
+      if (
+        !form.nome.trim() ||
+        !form.email.trim() ||
+        !form.telefone.trim() ||
+        !form.documento.trim() ||
+        !form.status.trim()
+      ) {
+        return false;
+      }
+      return true;
+  }
+
 
   const addReservation = async () => {
+    if (!validateForm()) 
+      return alert('Por favor, preencha todos os campos obrigatórios.');
     const newReservation = {
       id: Date.now().toString(),
       data,
@@ -72,13 +88,14 @@ const capitalize = (text: string) =>
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <TitleSubtitle title="Data da reserva: "/>
-      <TitleSubtitle title= {normalizeDate(new Date(data)).toLocaleDateString()}/>
+      <TitleSubtitle subtitle= {normalizeDate(new Date(data)).toLocaleDateString()}/>
       <Text style={styles.sectionTitle}>Dados do Cliente</Text>
       <TextInput
         style={styles.input}
         placeholder="Nome completo"
         value={form.nome}
         onChangeText={value => onChange('nome', value)}
+        maxLength={50}
       />
       <TextInput
         style={styles.input}
@@ -88,28 +105,46 @@ const capitalize = (text: string) =>
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      <TextInput
+      <TextInputMask
+        type={'cel-phone'}
+        options={{
+          maskType: 'BRL',
+          withDDD: true,
+          dddMask: '(99) '
+        }}
         style={styles.input}
         placeholder="Telefone"
         value={form.telefone}
         onChangeText={value => onChange('telefone', value)}
         keyboardType="phone-pad"
       />
-      <TextInput
+
+      <TextInputMask
+        type={'cpf'}
         style={styles.input}
-        placeholder="Documento (ex: CPF)"
+        placeholder="Documento (CPF)"
         value={form.documento}
         onChangeText={value => onChange('documento', value)}
+        keyboardType="numeric"
       />
 
       <Text style={styles.sectionTitle}>Informações da Reserva</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Serviço"
-        value={form.servico}
-        onChangeText={value => onChange('servico', value)}
-      />
+   <TextInput
+      style={styles.input}
+      placeholder="Serviço"
+      value={form.servico}
+      onChangeText={value => onChange('servico', value)}
+      maxLength={50}
+    />
+
+    <TextInput
+      style={styles.input}
+      placeholder="Observações"
+      value={form.observacoes}
+      onChangeText={value => onChange('observacoes', value)}
+      maxLength={50}
+    />
 
       <Text style={styles.sectionTitle}>Status</Text>
       <View style={styles.radioGroup}>
@@ -126,16 +161,9 @@ const capitalize = (text: string) =>
           </TouchableOpacity>
         ))}
       </View>
-
-      <TextInput
-        style={styles.input}
-        placeholder="Observações"
-        value={form.observacoes}
-        onChangeText={value => onChange('observacoes', value)}
-      />
-
+      
       <CreateReservationButton
-          title="Salvar reserva"
+          title="Salvar Reserva"
           onPress={addReservation}
           disabled={false}
       />

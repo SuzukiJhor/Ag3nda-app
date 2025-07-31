@@ -1,19 +1,34 @@
+import { db } from '@/firebase';
+import { normalizeDate } from '@/utils/normalizeDate';
+import { collection, onSnapshot } from 'firebase/firestore';
 import React from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
-import { reservas as reservasMock } from '../../mock/reservation';
 
 
 export default function RelatoriosScreen() {
+  const [reservas, setReservas] = React.useState<any[]>([]);
+
+    React.useEffect(() => {
+      const unsubscribe = onSnapshot(collection(db, 'reservas'), (snapshot) => {
+        const data = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setReservas(data);
+        });
+  
+      return () => unsubscribe();
+    }, []);
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Relatórios de Atendimentos</Text>
       <FlatList
-        data={reservasMock}
+        data={reservas}
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
           <View style={styles.card}>
             <Text style={styles.cliente}>{item.cliente}</Text>
-            <Text style={styles.info}>{item.data}</Text>
+            <Text style={styles.info}>{normalizeDate(new Date(item.data)).toLocaleDateString()}</Text>
             <Text style={styles.servico}>{item.servico}</Text>
           </View>
         )}

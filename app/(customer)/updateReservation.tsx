@@ -1,11 +1,13 @@
-import DangerButton from '@/components/button/ButtonCancelReservation';
 import CreateReservationButton from '@/components/button/ButtonCreateNewReservation';
-import { db } from '@/firebase';
+import { TitleSubtitle } from '@/components/button/TitleSubtitle';
 import { useHandleGoBack } from '@/hooks/useHandleGoBack';
+import { getReservaRefById } from '@/utils/getReservationRefById';
+import { normalizeDate } from '@/utils/normalizeDate';
 import { useLocalSearchParams } from 'expo-router';
-import { collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
+import { updateDoc } from 'firebase/firestore';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { TextInputMask } from 'react-native-masked-text';
 import { FormData, statusOptions } from '../types/form';
 
 export default function UpdateClientScreen() {
@@ -26,48 +28,30 @@ export default function UpdateClientScreen() {
     observacoes: getParamString(params.observacoes),
   });
 
+  function validateForm() {
+      if (
+        !form.nome.trim() ||
+        !form.email.trim() ||
+        !form.telefone.trim() ||
+        !form.documento.trim() ||
+        !form.status.trim()
+      ) {
+        return false;
+      }
+      return true;
+  }
+
   const onChange = (field: keyof typeof form, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }));
   };
 
   const capitalize = (text: string) =>
-  text.charAt(0).toUpperCase() + text.slice(1);
+  text.charAt(0).toUpperCase() + text.slice(1); 
 
-  async function getReservaRefById(idInterno: string) {
-    const reservasCol = collection(db, "reservas");
-    const q = query(reservasCol, where("id", "==", idInterno));
-    const querySnapshot = await getDocs(q);
-
-    if (querySnapshot.empty) {
-      return null;
-    }
-
-    const docSnap = querySnapshot.docs[0];
-    const documentId = docSnap.id;
-    return doc(db, "reservas", documentId);
-  }
-
-  
-  
-  const handleCancelReservation = async () => {
-    const rawId = Array.isArray(params.id) ? params.id[0] : params.id;
-    const idInterno = (rawId || "").trim();
-
-    try {
-      const reservaRef = await getReservaRefById(idInterno);
-      if (!reservaRef) {
-        alert("Reserva não encontrada com esse ID interno.");
-        return;
-      }
-      await updateDoc(reservaRef, { status: "cancelado" });
-      handleGoBack();
-    } catch (err) {
-      console.error("Erro ao cancelar reserva:", err);
-      alert("Erro ao cancelar reserva!");
-    }
-  };
 
   const handleUpdate = async () => {
+    if (!validateForm()) 
+      return alert('Por favor, preencha todos os campos obrigatórios.');
     const rawId = Array.isArray(params.id) ? params.id[0] : params.id;
     const idInterno = (rawId || "").trim();
 
@@ -88,7 +72,8 @@ export default function UpdateClientScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.label}>Data da reserva: {params.data}</Text>
+      <TitleSubtitle title="Data da reserva: "/>
+      <TitleSubtitle subtitle={normalizeDate(new Date(Array.isArray(params.data) ? params.data[0] : params.data)).toLocaleDateString()} />
 
       <Text style={styles.sectionTitle}>Dados do Cliente</Text>
       <TextInput
@@ -96,8 +81,9 @@ export default function UpdateClientScreen() {
         placeholder="Nome completo"
         value={form.nome}
         onChangeText={value => onChange('nome', value)}
+        maxLength={50}
       />
-      <TextInput
+       <TextInput
         style={styles.input}
         placeholder="Email"
         value={form.email}
@@ -105,29 +91,49 @@ export default function UpdateClientScreen() {
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      <TextInput
+
+     <TextInputMask
+        type={'cel-phone'}
+        options={{
+          maskType: 'BRL',
+          withDDD: true,
+          dddMask: '(99) '
+        }}
         style={styles.input}
         placeholder="Telefone"
         value={form.telefone}
         onChangeText={value => onChange('telefone', value)}
         keyboardType="phone-pad"
       />
-      <TextInput
+
+      <TextInputMask
+        type={'cpf'}
         style={styles.input}
-        placeholder="Documento (ex: CPF)"
+        placeholder="Documento (CPF)"
         value={form.documento}
         onChangeText={value => onChange('documento', value)}
+        keyboardType="numeric"
       />
 
-      <Text style={styles.sectionTitle}>Informações da Reserva</Text>
+    <Text style={styles.sectionTitle}>Informações da Reserva</Text>
+
       <TextInput
         style={styles.input}
         placeholder="Serviço"
         value={form.servico}
         onChangeText={value => onChange('servico', value)}
+        maxLength={50}
       />
 
-      <Text style={styles.sectionTitle}>Status</Text>
+    <TextInput
+      style={styles.input}
+      placeholder="Observações"
+      value={form.observacoes}
+      onChangeText={value => onChange('observacoes', value)}
+      maxLength={50}
+    />
+
+     <Text style={styles.sectionTitle}>Status</Text>
       <View style={styles.radioGroup}>
         {statusOptions.map(option => (
           <TouchableOpacity
@@ -143,13 +149,6 @@ export default function UpdateClientScreen() {
         ))}
       </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Observações"
-        value={form.observacoes}
-        onChangeText={value => onChange('observacoes', value)}
-      />
-
     <CreateReservationButton
         title="Salvar alterações"
         onPress={handleUpdate}
@@ -157,13 +156,6 @@ export default function UpdateClientScreen() {
     />
 
     <View style={{ height: 8 }} />
-
-    <DangerButton
-        title="Cancelar reserva"
-        onPress={handleCancelReservation}
-        disabled={false}
-    />
-
 
     </ScrollView>
   );
@@ -173,7 +165,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     backgroundColor: '#fff',
-    paddingTop: 54,
+    paddingTop: 12,
     flexGrow: 1,
   },
   label: {
