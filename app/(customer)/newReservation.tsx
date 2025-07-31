@@ -72,7 +72,7 @@ const capitalize = (text: string) =>
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <TitleSubtitle title="Data da reserva: "/>
-      <TitleSubtitle subtitle= {normalizeDate(new Date(data)).toLocaleDateString()}/>
+      <TitleSubtitle title= {normalizeDate(new Date(data)).toLocaleDateString()}/>
       <Text style={styles.sectionTitle}>Dados do Cliente</Text>
       <TextInput
         style={styles.input}

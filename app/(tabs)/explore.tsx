@@ -1,17 +1,30 @@
+import CreateReservationButton from '@/components/button/ButtonCreateNewReservation';
+import { TitleSubtitle } from '@/components/button/TitleSubtitle';
+import { db } from '@/firebase';
+import { collection, onSnapshot } from 'firebase/firestore';
 import React from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
-const clientesExemplo = [
-  { id: '1', nome: 'Maria Silva', telefone: '(11) 99999-1111', email: 'maria@email.com' },
-  { id: '2', nome: 'João Souza', telefone: '(11) 98888-2222', email: 'joao@email.com' },
-];
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 export default function ClientesScreen() {
+    const [reservas, setReservas] = React.useState<any[]>([]);
+  
+    React.useEffect(() => {
+      const unsubscribe = onSnapshot(collection(db, 'reservas'), (snapshot) => {
+        const data = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setReservas(data);
+        });
+  
+      return () => unsubscribe();
+    }, []);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Clientes</Text>
+      <TitleSubtitle title="Clientes"/>
       <FlatList
-        data={clientesExemplo}
+        data={reservas}
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
           <View style={styles.card}>
@@ -22,16 +35,18 @@ export default function ClientesScreen() {
         )}
         ListEmptyComponent={<Text style={styles.empty}>Nenhum cliente cadastrado.</Text>}
       />
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>+ Novo Cliente</Text>
-      </TouchableOpacity>
+  
+       <CreateReservationButton
+        title="+ Novo Cliente"
+        onPress={() => console.log('clicou')}
+        disabled={true}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fff', paddingTop: 54 },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 16, textAlign: 'center' },
+  container: { flex: 1, padding: 20, backgroundColor: '#fff', paddingTop: 24 },
   card: { backgroundColor: '#f1f1f1', padding: 16, borderRadius: 8, marginBottom: 12 },
   nome: { fontSize: 18, fontWeight: '600' },
   info: { fontSize: 14, color: '#555', marginTop: 4 },
