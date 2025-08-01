@@ -21,15 +21,15 @@ export default function RelatoriosScreen() {
     }, []);
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Relatórios de Atendimentos</Text>
+      <Text style={styles.title}>Atendimentos</Text>
       <FlatList
         data={reservas}
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
           <View style={styles.card}>
-            <Text style={styles.cliente}>{item.cliente}</Text>
+            <Text style={styles.cliente}>{item.nome}</Text>
             <Text style={styles.info}>{normalizeDate(new Date(item.data)).toLocaleDateString()}</Text>
-            <Text style={styles.servico}>{item.servico}</Text>
+            <Text style={styles.servico}>{item.telefone}</Text>
           </View>
         )}
         ListEmptyComponent={<Text style={styles.empty}>Nenhum atendimento registrado.</Text>}
