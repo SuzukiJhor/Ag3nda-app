@@ -15,18 +15,6 @@ export default function AgendaScreen() {
   const router = useRouter();
   const reservasDoDia = reservas.filter(r => r.data === selected);
 
-  React.useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, 'reservas'), (snapshot) => {
-      const data = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setReservas(data);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
   const markedDates = React.useMemo(() => {
     const result: Record<string, {
       marked?: boolean;
@@ -43,7 +31,7 @@ export default function AgendaScreen() {
       result[selected] = {
         ...(result[selected] || {}),
         selected: true,
-        selectedColor: '#007AFF',
+        selectedColor: '#EB5E28',
       };
     }
 
@@ -61,12 +49,12 @@ export default function AgendaScreen() {
     if (!id) return;
 
     try {
-      const reservaRef = await getReservaRefById(id);
-      if (!reservaRef) {
+      const reservationRef = await getReservaRefById(id);
+      if (!reservationRef) {
         alert("Reserva não encontrada com esse ID interno.");
         return;
       }
-      await updateDoc(reservaRef, { status: "cancelado" });
+      await updateDoc(reservationRef, { status: "cancelado" });
     } catch (err) {
       console.error("Erro ao cancelar reserva:", err);
       alert("Erro ao cancelar reserva!");
@@ -84,6 +72,18 @@ export default function AgendaScreen() {
     if (!selected) return;
     return router.push({ pathname: '/newReservation', params: { data: selected } });
   };
+
+    React.useEffect(() => {
+      const unsubscribe = onSnapshot(collection(db, 'reservas'), (snapshot) => {
+        const data = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setReservas(data);
+      });
+
+      return () => unsubscribe();
+    }, []);
 
   return (
     <View style={styles.container}>
@@ -176,7 +176,16 @@ const styles = StyleSheet.create({
   cardRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+    borderWidth: 1,
   },
   cardContent: {
     flex: 1,

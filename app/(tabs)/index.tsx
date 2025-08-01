@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: '#fff', paddingTop: 54 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   settingsButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#EB5E28',
     padding: 8,
     borderRadius: 20,
   },
@@ -161,13 +161,14 @@ const styles = StyleSheet.create({
   nomeReserva: {
     fontWeight: 'bold',
     fontSize: 20,
+    color: '#403D39',
   },
   dataReserva: {
-    color: '#666',
+    color: '#252422',
     marginTop: 4,
   },
   iconCalendar: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#403D39',
     width: 48,
     height: 48,
     borderRadius: 10,

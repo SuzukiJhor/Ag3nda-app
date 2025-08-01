@@ -22,13 +22,13 @@ export default function CreateReservationButton({ title, onPress, disabled = fal
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#EB5E28',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
   },
   disabledButton: {
-    backgroundColor: '#a0c4ff',
+    backgroundColor: '#CCC5B9',
   },
   text: {
     color: 'white',

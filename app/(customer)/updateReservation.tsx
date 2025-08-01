@@ -80,7 +80,7 @@ export default function UpdateClientScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <TitleSubtitle title="Data da reserva: "/>
-      <TitleSubtitle subtitle={normalizeDate(new Date(Array.isArray(params.data) ? params.data[0] : params.data)).toLocaleDateString()} />
+      <TitleSubtitle title={normalizeDate(new Date(Array.isArray(params.data) ? params.data[0] : params.data)).toLocaleDateString()} />
 
       <Text style={styles.sectionTitle}>Dados do Cliente</Text>
       <TextInput
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 24,
     marginBottom: 8,
-    color: '#333',
+    color: '#EB5E28',
   },
   input: {
     borderWidth: 1,

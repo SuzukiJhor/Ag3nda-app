@@ -13,7 +13,7 @@ export const TitleSubtitle = ({ title, subtitle, align = 'left' }: Props) => {
   if (!title && !subtitle) return null;
 
   return (
-    <View style={[styles.container, { alignItems: alignMap[align] }]}>
+    <View style={[{ alignItems: alignMap[align] }]}>
       {title && <Text style={styles.title}>{title}</Text>}
       {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
     </View>
@@ -27,18 +27,18 @@ const alignMap: Record<'left' | 'center' | 'right', FlexAlignType> = {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    marginVertical: 12,
-  },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#000',
+    fontSize: 28,
+    fontWeight: '600',
+    color: '#403D39',
+    fontStyle: 'normal',
+    letterSpacing: 0.6,
   },
   subtitle: {
-    fontSize: 18,
-    fontWeight: 'semibold',
-    color: '#007AFF',
-    marginTop: 6,
+    fontSize: 16,
+    fontWeight: '400',
+    color: '#EB5E28',
+    marginBottom: 22,
   },
 });
+

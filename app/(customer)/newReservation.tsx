@@ -6,6 +6,7 @@ import { useHandleGoBack } from '@/hooks/useHandleGoBack';
 import { maskCpf } from '@/utils/maskCPF';
 import { maskPhone } from '@/utils/maskPhone';
 import { normalizeDate } from '@/utils/normalizeDate';
+import { getStatusColor } from '@/utils/statusColors';
 import { useLocalSearchParams } from 'expo-router';
 import { addDoc, collection } from 'firebase/firestore';
 import React from 'react';
@@ -87,7 +88,7 @@ const capitalize = (text: string) =>
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <TitleSubtitle title="Data da reserva: "/>
-      <TitleSubtitle subtitle= {normalizeDate(new Date(data)).toLocaleDateString()}/>
+      <TitleSubtitle title= {normalizeDate(new Date(data)).toLocaleDateString()}/>
       <Text style={styles.sectionTitle}>Dados do Cliente</Text>
       <TextInput
         style={styles.input}
@@ -138,20 +139,36 @@ const capitalize = (text: string) =>
       maxLength={50}
     />
 
-      <Text style={styles.sectionTitle}>Status</Text>
-      <View style={styles.radioGroup}>
-        {statusOptions.map(option => (
-          <TouchableOpacity
-            key={option}
-            style={styles.radioButton}
-            onPress={() => onChange('status', option)}
-          >
-            <View style={styles.radioCircle}>
-              {form.status === option && <View style={styles.radioSelected} />}
-            </View>
-            <Text style={styles.radioLabel}>{capitalize(option)}</Text>
-          </TouchableOpacity>
-        ))}
+     <Text style={styles.sectionTitle}>Status</Text>
+      <View style={styles.toggleGroup}>
+        {statusOptions.map(option => {
+          const isSelected = form.status === option;
+          const selectedColor = getStatusColor(option);
+          return (
+            <TouchableOpacity
+              key={option}
+              onPress={() => onChange('status', option)}
+              style={[
+                styles.toggleButton,
+                isSelected && {
+                  backgroundColor: selectedColor,
+                  borderColor: selectedColor,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.toggleButtonText,
+                  isSelected && {
+                    color: ['pendente', 'expirado'].includes(option) ? '#333' : '#fff',
+                  },
+                ]}
+              >
+                {capitalize(option)}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
       
       <CreateReservationButton
@@ -179,7 +196,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 24,
     marginBottom: 8,
-    color: '#333',
+    color: '#EB5E28',
   },
   input: {
     borderWidth: 1,
@@ -220,4 +237,35 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textTransform: 'capitalize',
   },
+  toggleGroup: {
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  gap: 12,
+  marginBottom: 16,
+},
+
+toggleButton: {
+  paddingVertical: 10,
+  paddingHorizontal: 16,
+  borderRadius: 8,
+  borderWidth: 1,
+  borderColor: '#ccc',
+  backgroundColor: '#f1f1f1',
+},
+
+toggleButtonSelected: {
+  backgroundColor: '#EB5E28',
+  borderColor: '#EB5E28',
+},
+
+toggleButtonText: {
+  fontSize: 14,
+  color: '#444',
+  fontWeight: '500',
+},
+
+toggleButtonTextSelected: {
+  color: '#fff',
+}
+
 });
