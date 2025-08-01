@@ -3,7 +3,6 @@ import { TitleSubtitle } from '@/components/button/TitleSubtitle';
 import '@/config/calendarLocale';
 import { db } from '@/firebase';
 import { getReservaRefById } from '@/utils/getReservationRefById';
-import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { collection, onSnapshot, updateDoc } from 'firebase/firestore';
 import React from 'react';
@@ -109,11 +108,15 @@ export default function AgendaScreen() {
               <Text>{item.status}</Text>
             </TouchableOpacity>
 
-            {item.status !== 'cancelado' && (
-              <TouchableOpacity onPress={() => handleCancelReservation(item.id)}>
-                <Feather name="trash-2" size={22} color="red" />
+          {item.status !== 'cancelado' && (
+              <TouchableOpacity 
+                onPress={() => handleCancelReservation(item.id)} 
+                style={styles.buttonCancel}
+              >
+                <Text style={{ color: 'red', fontSize: 14 }}>Cancelar</Text>
               </TouchableOpacity>
             )}
+
           </View>
         )}
 
@@ -137,11 +140,6 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#fff',
     paddingTop: 54,
-  },
-  label: {
-    fontWeight: 'bold',
-    marginTop: 16,
-    marginBottom: 8,
   },
   card: {
     padding: 12,
@@ -183,5 +181,14 @@ const styles = StyleSheet.create({
   cardContent: {
     flex: 1,
     gap: 4,
+  },
+  buttonCancel: {
+    backgroundColor: '#f8d7da',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 5,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

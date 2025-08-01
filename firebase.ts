@@ -3,13 +3,13 @@ import { getFirestore } from 'firebase/firestore';
 
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA1B2C3D4E5F6G7H8I9J0KLMNOPQRST",
-  authDomain: "meu-app-firebase.firebaseapp.com",
-  projectId: "meu-app-firebase",
-  storageBucket: "meu-app-firebase.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdef1234567890abcdef",
-  measurementId: "G-ABCDEFGHJK",
+  apiKey: "AIzaSyBi-xMV9YcINXEtLpykuPlrsW-hjWurVF0",
+  authDomain: "agendala-68714.firebaseapp.com",
+  projectId: "agendala-68714",
+  storageBucket: "agendala-68714.firebasestorage.app",
+  messagingSenderId: "600695293831",
+  appId: "1:600695293831:web:129d0e445d834fd8837522",
+  measurementId: "G-PZCF664R7K"
 };
 
 
