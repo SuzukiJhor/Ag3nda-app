@@ -35,7 +35,6 @@
     "react-native-calendars": "^1.1313.0",
     "react-native-config": "^1.5.5",
     "react-native-gesture-handler": "~2.24.0",
-    "react-native-masked-text": "^1.13.0",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
@@ -48,7 +47,6 @@
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0",
     "metro-react-native-babel-preset": "^0.77.0",
-    "react-native-dotenv": "^3.4.11",
     "typescript": "~5.8.3"
   },
   "private": true

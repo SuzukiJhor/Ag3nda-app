@@ -2,6 +2,8 @@ import CreateReservationButton from '@/components/button/ButtonCreateNewReservat
 import { TitleSubtitle } from '@/components/button/TitleSubtitle';
 import { db } from '@/firebase';
 import { useHandleGoBack } from '@/hooks/useHandleGoBack';
+import { maskCpf } from '@/utils/maskCPF';
+import { maskPhone } from '@/utils/maskPhone';
 import { normalizeDate } from '@/utils/normalizeDate';
 import { useLocalSearchParams } from 'expo-router';
 import { addDoc, collection } from 'firebase/firestore';
@@ -14,7 +16,6 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { TextInputMask } from 'react-native-masked-text';
 
 type FormData = {
   nome: string;
@@ -105,26 +106,19 @@ const capitalize = (text: string) =>
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      <TextInputMask
-        type={'cel-phone'}
-        options={{
-          maskType: 'BRL',
-          withDDD: true,
-          dddMask: '(99) '
-        }}
+      <TextInput
         style={styles.input}
         placeholder="Telefone"
         value={form.telefone}
-        onChangeText={value => onChange('telefone', value)}
+        onChangeText={value => onChange('telefone', maskPhone(value))}
         keyboardType="phone-pad"
       />
 
-      <TextInputMask
-        type={'cpf'}
+      <TextInput
         style={styles.input}
         placeholder="Documento (CPF)"
         value={form.documento}
-        onChangeText={value => onChange('documento', value)}
+        onChangeText={value => onChange('documento', maskCpf(value))}
         keyboardType="numeric"
       />
 

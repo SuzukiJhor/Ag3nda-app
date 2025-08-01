@@ -2,12 +2,13 @@ import CreateReservationButton from '@/components/button/ButtonCreateNewReservat
 import { TitleSubtitle } from '@/components/button/TitleSubtitle';
 import { useHandleGoBack } from '@/hooks/useHandleGoBack';
 import { getReservaRefById } from '@/utils/getReservationRefById';
+import { maskCpf } from '@/utils/maskCPF';
+import { maskPhone } from '@/utils/maskPhone';
 import { normalizeDate } from '@/utils/normalizeDate';
 import { useLocalSearchParams } from 'expo-router';
 import { updateDoc } from 'firebase/firestore';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { TextInputMask } from 'react-native-masked-text';
 import { FormData, statusOptions } from '../types/form';
 
 export default function UpdateClientScreen() {
@@ -92,28 +93,21 @@ export default function UpdateClientScreen() {
         autoCapitalize="none"
       />
 
-     <TextInputMask
-        type={'cel-phone'}
-        options={{
-          maskType: 'BRL',
-          withDDD: true,
-          dddMask: '(99) '
-        }}
-        style={styles.input}
-        placeholder="Telefone"
-        value={form.telefone}
-        onChangeText={value => onChange('telefone', value)}
-        keyboardType="phone-pad"
-      />
+     <TextInput
+      style={styles.input}
+      placeholder="Telefone"
+      value={form.telefone}
+      onChangeText={value => onChange('telefone', maskPhone(value))}
+      keyboardType="phone-pad"
+    />
 
-      <TextInputMask
-        type={'cpf'}
-        style={styles.input}
-        placeholder="Documento (CPF)"
-        value={form.documento}
-        onChangeText={value => onChange('documento', value)}
-        keyboardType="numeric"
-      />
+    <TextInput
+      style={styles.input}
+      placeholder="Documento (CPF)"
+      value={form.documento}
+      onChangeText={value => onChange('documento', maskCpf(value))}
+      keyboardType="numeric"
+    />
 
     <Text style={styles.sectionTitle}>Informações da Reserva</Text>
 
