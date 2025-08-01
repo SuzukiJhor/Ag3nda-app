@@ -1,17 +1,27 @@
+import Constants from 'expo-constants';
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+interface FirebaseConfig {
+  apiKey: string;
+  authDomain: string;
+  projectId: string;
+  storageBucket: string;
+  messagingSenderId: string;
+  appId: string;
+  measurementId: string;
+}
 
-
+const extra = Constants.expoConfig?.extra as FirebaseConfig;
+console.log('extra', extra);
 const firebaseConfig = {
-  apiKey: "AIzaSyBi-xMV9YcINXEtLpykuPlrsW-hjWurVF0",
-  authDomain: "agendala-68714.firebaseapp.com",
-  projectId: "agendala-68714",
-  storageBucket: "agendala-68714.firebasestorage.app",
-  messagingSenderId: "600695293831",
-  appId: "1:600695293831:web:129d0e445d834fd8837522",
-  measurementId: "G-PZCF664R7K"
+  apiKey: extra.apiKey,
+  authDomain: extra.authDomain,
+  projectId: extra.projectId,
+  storageBucket: extra.storageBucket,
+  messagingSenderId: extra.messagingSenderId,
+  appId: extra.appId,
+  measurementId: extra.measurementId,
 };
-
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);

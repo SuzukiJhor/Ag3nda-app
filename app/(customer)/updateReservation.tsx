@@ -146,7 +146,7 @@ export default function UpdateClientScreen() {
     <CreateReservationButton
         title="Salvar alterações"
         onPress={handleUpdate}
-        disabled={false}
+        disabled={!validateForm()}
     />
 
     <View style={{ height: 8 }} />

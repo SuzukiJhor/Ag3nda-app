@@ -39,6 +39,14 @@ export default function AgendaScreen() {
     return dias;
   }, [reservas]);
 
+  const handleEditReservation = (item: any) => {
+    if (!item) return;
+    router.push({
+      pathname: '/updateReservation',
+      params: { ...item }
+    });
+  };
+
   const handleAddReservation = () => {
     console.log('selected', selected);
      if (!selected) return;
@@ -67,29 +75,44 @@ export default function AgendaScreen() {
       </View>
 
     {todaySchedules.length > 0 ? (
-      <View style={styles.proximaReservaCard}>
-        <TitleSubtitle subtitle="Agendamentos para Hoje" />
-        {todaySchedules.map((reserva, index) => (
-          <View style={styles.proximaReservaRow} key={reserva.id ?? index}>
-            <View>
-              <Text style={styles.nomeReserva}>{reserva.nome}</Text>
-              <Text style={styles.dataReserva}>
-                {formatarData(parseLocalDate(reserva.data))} de {parseLocalDate(reserva.data).getFullYear()}
-              </Text>
-            </View>
-            <View style={styles.iconCalendar}>
-              <Text style={styles.iconCalendarText}>
-                {parseLocalDate(reserva.data).getDate()}
-              </Text>
-            </View>
-          </View>
-        ))}
-      </View>
-    ) : (
-      <View style={[styles.proximaReservaCard, { justifyContent: 'center', alignItems: 'center' }]}>
-         <TitleSubtitle subtitle="Nenhum agendamento para hoje" />
-      </View>
-    )}
+        <View style={styles.proximaReservaCard}>
+          <TitleSubtitle subtitle="Agendamentos para Hoje" />
+          {todaySchedules.map((reserva, index) => {
+            const isCanceled = reserva.status === 'cancelado';
+            return (
+              <TouchableOpacity
+                key={reserva.id ?? index}
+                style={styles.proximaReservaRow}
+                onPress={() => handleEditReservation(reserva)}
+                activeOpacity={0.7}
+              >
+                <View>
+                  <Text style={styles.nomeReserva}>{reserva.nome}</Text>
+                  <Text style={styles.dataReserva}>
+                    {formatarData(parseLocalDate(reserva.data))} de {parseLocalDate(reserva.data).getFullYear()}
+                  </Text>
+                  {isCanceled && (
+                    <View style={styles.faixaCancelado}>
+                      <Text style={styles.textoCancelado}>CANCELADO</Text>
+                    </View>
+                  )}
+                </View>
+                <View style={styles.iconCalendar}>
+                  <Text style={styles.iconCalendarText}>
+                    {parseLocalDate(reserva.data).getDate()}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      ) : (
+        <View style={[styles.proximaReservaCard, { justifyContent: 'center', alignItems: 'center' }]}>
+          <TitleSubtitle subtitle="Nenhum agendamento para hoje" />
+        </View>
+      )}
+
+
 
       <CreateReservationButton
         title="+ Nova Reserva"
@@ -170,4 +193,18 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: '#ddd',
   },
+  faixaCancelado: {
+    backgroundColor: '#ff4d4d',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 6,
+    marginTop: 6,
+    alignSelf: 'flex-start',
+  },
+  textoCancelado: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+
 });

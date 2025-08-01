@@ -159,7 +159,7 @@ const capitalize = (text: string) =>
       <CreateReservationButton
           title="Salvar Reserva"
           onPress={addReservation}
-          disabled={false}
+          disabled={!validateForm()}
       />
 
     </ScrollView>
