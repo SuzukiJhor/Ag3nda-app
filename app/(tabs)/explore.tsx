@@ -22,7 +22,7 @@ export default function ClientesScreen() {
 
   return (
     <View style={styles.container}>
-      <TitleSubtitle title="Clientes"/>
+      <TitleSubtitle title="Reservas"/>
       <FlatList
         data={reservas}
         keyExtractor={item => item.id}

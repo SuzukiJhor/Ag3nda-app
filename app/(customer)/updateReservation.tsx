@@ -1,5 +1,6 @@
 import CreateReservationButton from '@/components/button/ButtonCreateNewReservation';
 import { TitleSubtitle } from '@/components/button/TitleSubtitle';
+import Loading from '@/components/Loading';
 import { useHandleGoBack } from '@/hooks/useHandleGoBack';
 import { getReservaRefById } from '@/utils/getReservationRefById';
 import { maskCpf } from '@/utils/maskCPF';
@@ -12,6 +13,7 @@ import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 
 import { FormData, statusOptions } from '../types/form';
 
 export default function UpdateClientScreen() {
+  const [loading, setLoading] = React.useState(false);
   const handleGoBack = useHandleGoBack({ fallbackRoute: "/(tabs)" });
   const params = useLocalSearchParams();
   const getParamString = (param: string | string[] | undefined) => {
@@ -51,8 +53,10 @@ export default function UpdateClientScreen() {
 
 
   const handleUpdate = async () => {
+    setLoading(true);
     if (!validateForm()) 
-      return alert('Por favor, preencha todos os campos obrigatórios.');
+      return console.error('Por favor, preencha todos os campos obrigatórios.');
+
     const rawId = Array.isArray(params.id) ? params.id[0] : params.id;
     const idInterno = (rawId || "").trim();
 
@@ -63,13 +67,15 @@ export default function UpdateClientScreen() {
         return;
       }
       await updateDoc(reservaRef, { ...form });
-      alert("Reserva atualizada com sucesso!");
       handleGoBack();
     } catch (err) {
       console.error("Erro ao atualizar reserva:", err);
-      alert("Erro ao atualizar reserva!");
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) return <Loading />;
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

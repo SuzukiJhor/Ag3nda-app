@@ -1,5 +1,6 @@
 import CreateReservationButton from '@/components/button/ButtonCreateNewReservation';
 import { TitleSubtitle } from '@/components/button/TitleSubtitle';
+import Loading from '@/components/Loading';
 import { db } from '@/firebase';
 import { useHandleGoBack } from '@/hooks/useHandleGoBack';
 import { maskCpf } from '@/utils/maskCPF';
@@ -16,21 +17,12 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-
-type FormData = {
-  nome: string;
-  email: string;
-  telefone: string;
-  documento: string;
-  servico: string;
-  status: string;
-  observacoes: string;
-};
+import { FormData } from '../types/form';
 
 export default function NewReservationScreen() {
   const { data } = useLocalSearchParams<{ data: string }>();
   const handleGoBack = useHandleGoBack({ fallbackRoute: "/(tabs)" });
-
+  const [loading, setLoading] = React.useState(false);
   const [form, setForm] = React.useState<FormData>({
     nome: '',
     email: '',
@@ -60,20 +52,24 @@ export default function NewReservationScreen() {
 
 
   const addReservation = async () => {
+    setLoading(true);
     if (!validateForm()) 
-      return alert('Por favor, preencha todos os campos obrigatórios.');
+      return console.error('Por favor, preencha todos os campos obrigatórios.');
+
     const newReservation = {
       id: Date.now().toString(),
       data,
       ...form,
     };
+  
     try {
       await addDoc(collection(db, 'reservas'), newReservation);
-      handleGoBack();
+      return handleGoBack();
     } catch (error) {
       console.error('Erro ao salvar reserva:', error);
+    } finally {
+      setLoading(false);
     }
-    return;
   };
 
 const capitalize = (text: string) =>
@@ -85,6 +81,8 @@ const capitalize = (text: string) =>
     'cancelado',
     'expirado',
   ];
+  
+  if (loading) return <Loading />;
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

@@ -14,15 +14,15 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function AgendaScreen() {
   const [selected] = React.useState(getTodayFormatted());
-  const [reservas, setReservas] = React.useState<any[]>([]);
+  const [reservation, setReservation] = React.useState<any[]>([]);
   const router = useRouter();
 
   const todaySchedules = React.useMemo(() => {
-    return reservas.filter(r => {
+    return reservation.filter(r => {
       const reservaDate = parseLocalDate(r.data);
       return normalizeDate(reservaDate).getTime() === today.getTime();
     });
-  }, [reservas]);
+  }, [reservation]);
 
   const nextDates = React.useMemo(() => {
     const dias = [];
@@ -30,14 +30,14 @@ export default function AgendaScreen() {
       const d = new Date(today);
       d.setDate(today.getDate() + i);
       const dataStr = d.toISOString().slice(0, 10);
-     const reservationsOnTheDay = reservas.filter(r => r.data === dataStr && r.status !== 'cancelado' && r.status !== 'expirado'); 
+     const reservationsOnTheDay = reservation.filter(r => r.data === dataStr && r.status !== 'cancelado' && r.status !== 'expirado'); 
       dias.push({
         data: d,
         status: reservationsOnTheDay.length > 0 ? 'Ocupado' : 'Livre',
       });
     }
     return dias;
-  }, [reservas]);
+  }, [reservation]);
 
   const handleEditReservation = (item: any) => {
     if (!item) return;
@@ -48,7 +48,6 @@ export default function AgendaScreen() {
   };
 
   const handleAddReservation = () => {
-    console.log('selected', selected);
      if (!selected) return;
     return router.push({ pathname: '/newReservation', params: { data: selected } });
   };
@@ -59,7 +58,7 @@ export default function AgendaScreen() {
         id: doc.id,
         ...doc.data(),
       }));
-      setReservas(data);
+      setReservation(data);
     });
 
     return () => unsubscribe();

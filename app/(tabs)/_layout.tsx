@@ -40,7 +40,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Clientes',
+          title: 'Reservas',
           tabBarIcon: ({ color }) => <Feather name="users" size={24} color={color} />,
         }}
       />
