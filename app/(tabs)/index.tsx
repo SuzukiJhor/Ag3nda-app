@@ -5,12 +5,14 @@ import { db } from '@/firebase';
 import { getTodayFormatted } from '@/utils/getTodayFormatted';
 import { normalizeDate } from '@/utils/normalizeDate';
 import { formatarData, parseLocalDate } from '@/utils/parseLocalDate';
+import { getStatusColor } from '@/utils/statusColors';
 import { today } from '@/utils/todayDate';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { collection, onSnapshot } from 'firebase/firestore';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import logo from '../../assets/images/logo.png';
 
 export default function AgendaScreen() {
   const [selected] = React.useState(getTodayFormatted());
@@ -26,7 +28,7 @@ export default function AgendaScreen() {
 
   const nextDates = React.useMemo(() => {
     const dias = [];
-    for (let i = 1; i <= 3; i++) {
+    for (let i = 1; i <= 7; i++) {
       const d = new Date(today);
       d.setDate(today.getDate() + i);
       const dataStr = d.toISOString().slice(0, 10);
@@ -67,7 +69,10 @@ export default function AgendaScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TitleSubtitle title="Recanto Suzuki" />
+          <Image
+            source={logo}
+            style={{ width: 180, height: 150, resizeMode: 'contain', alignSelf: 'flex-start' }}
+          />
         <TouchableOpacity style={styles.settingsButton} onPress={() => {}}>
           <Ionicons name="settings" size={24} color="white" />
         </TouchableOpacity>
@@ -76,34 +81,34 @@ export default function AgendaScreen() {
     {todaySchedules.length > 0 ? (
         <View style={styles.proximaReservaCard}>
           <TitleSubtitle subtitle="Agendamentos para Hoje" />
-          {todaySchedules.map((reserva, index) => {
-            const isCanceled = reserva.status === 'cancelado';
-            return (
-              <TouchableOpacity
-                key={reserva.id ?? index}
-                style={styles.proximaReservaRow}
-                onPress={() => handleEditReservation(reserva)}
-                activeOpacity={0.7}
-              >
-                <View>
-                  <Text style={styles.nomeReserva}>{reserva.nome}</Text>
-                  <Text style={styles.dataReserva}>
-                    {formatarData(parseLocalDate(reserva.data))} de {parseLocalDate(reserva.data).getFullYear()}
-                  </Text>
-                  {isCanceled && (
-                    <View style={styles.faixaCancelado}>
-                      <Text style={styles.textoCancelado}>CANCELADO</Text>
-                    </View>
-                  )}
+          {todaySchedules.map((reservation, index) => {
+          let beltText = reservation.status?.toUpperCase() || 'INDEFINIDO';
+          let beltColor = getStatusColor(reservation.status);
+
+          return (
+            <TouchableOpacity
+              key={reservation.id ?? index}
+              style={styles.proximaReservaRow}
+              onPress={() => handleEditReservation(reservation)}
+              activeOpacity={0.7}
+            >
+              <View>
+                <Text style={styles.nomeReserva}>{reservation.nome}</Text>
+                <Text style={styles.dataReserva}>
+                  {formatarData(parseLocalDate(reservation.data))} de {parseLocalDate(reservation.data).getFullYear()}
+                </Text>
+                <View style={[styles.faixaCancelado, { backgroundColor: beltColor }]}>
+                  <Text style={styles.textoCancelado}>{beltText}</Text>
                 </View>
-                <View style={styles.iconCalendar}>
-                  <Text style={styles.iconCalendarText}>
-                    {parseLocalDate(reserva.data).getDate()}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            );
-          })}
+              </View>
+              <View style={styles.iconCalendar}>
+                <Text style={styles.iconCalendarText}>
+                  {parseLocalDate(reservation.data).getDate()}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
         </View>
       ) : (
         <View style={[styles.proximaReservaCard, { justifyContent: 'center', alignItems: 'center' }]}>
@@ -111,32 +116,34 @@ export default function AgendaScreen() {
         </View>
       )}
 
-
-
+    <TitleSubtitle subtitle="Próximas datas:" />
+    <FlatList
+      data={nextDates}
+      keyExtractor={(_, index) => index.toString()}
+      renderItem={({ item }) => (
+        <View style={styles.dataStatusRow}>
+          <Text>{formatarData(item.data)}</Text>
+          <Text style={{ color: item.status === 'Livre' ? 'green' : 'red' }}>
+            {item.status}
+          </Text>
+        </View>
+      )}
+    />
+      
       <CreateReservationButton
         title="+ Nova Reserva"
         onPress={handleAddReservation}
         disabled={false}
       />
-
-      <View style={styles.proximasDatasCard}>
-        <TitleSubtitle subtitle="Próximas datas:" />
-        {nextDates.map((item, index) => (
-          <View style={styles.dataStatusRow} key={index}>
-            <Text>{formatarData(item.data)}</Text>
-            <Text style={{ color: item.status === 'Livre' ? 'green' : 'red' }}>{item.status}</Text>
-          </View>
-        ))}
-      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: '#fff', paddingTop: 54 },
+  container: { flex: 1, padding: 16, backgroundColor: '#fff', paddingTop: 4 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   settingsButton: {
-    backgroundColor: '#EB5E28',
+    backgroundColor: '#7209b7',
     padding: 8,
     borderRadius: 20,
   },
@@ -168,7 +175,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   iconCalendar: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#EB5E28',
     width: 48,
     height: 48,
     borderRadius: 10,

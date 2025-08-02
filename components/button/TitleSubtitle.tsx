@@ -28,9 +28,9 @@ const alignMap: Record<'left' | 'center' | 'right', FlexAlignType> = {
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: '600',
-    color: '#403D39',
+    color: '#7209b7',
     fontStyle: 'normal',
     letterSpacing: 0.6,
   },

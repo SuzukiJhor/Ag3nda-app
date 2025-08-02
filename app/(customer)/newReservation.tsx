@@ -11,12 +11,14 @@ import { useLocalSearchParams } from 'expo-router';
 import { addDoc, collection } from 'firebase/firestore';
 import React from 'react';
 import {
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import Modal from 'react-native-modal';
 import { FormData } from '../types/form';
@@ -95,112 +97,128 @@ export default function NewReservationScreen() {
   if (loading) return <Loading />;
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <TitleSubtitle title="Data da reserva: " />
-      <TitleSubtitle
-        title={normalizeDate(new Date(data)).toLocaleDateString()}
-      />
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={80}
+    >
+      <ScrollView contentContainerStyle={styles.container}>
+        <TitleSubtitle title="Data da reserva: " />
+        <TitleSubtitle title={normalizeDate(new Date(data)).toLocaleDateString()} />
 
-      <Text style={styles.sectionTitle}>Dados do Cliente</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nome completo"
-        value={form.nome}
-        onChangeText={(value) => onChange('nome', value)}
-        maxLength={50}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={form.email}
-        onChangeText={(value) => onChange('email', value)}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Telefone"
-        value={form.telefone}
-        onChangeText={(value) => onChange('telefone', maskPhone(value))}
-        keyboardType="phone-pad"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Documento (CPF)"
-        value={form.documento}
-        onChangeText={(value) => onChange('documento', maskCpf(value))}
-        keyboardType="numeric"
-      />
+        <Text style={styles.sectionTitle}>Dados do Cliente</Text>
 
-      <Text style={styles.sectionTitle}>Informações da Reserva</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Serviço"
-        value={form.servico}
-        onChangeText={(value) => onChange('servico', value)}
-        maxLength={50}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Observações"
-        value={form.observacoes}
-        onChangeText={(value) => onChange('observacoes', value)}
-        maxLength={50}
-      />
+        <Text style={styles.label}>Nome completo</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Nome completo"
+          value={form.nome}
+          onChangeText={(value) => onChange('nome', value)}
+          maxLength={50}
+        />
 
-      <Text style={styles.sectionTitle}>Status</Text>
-      <View style={styles.toggleGroup}>
-        {statusOptions.map((option) => {
-          const isSelected = form.status === option;
-          const selectedColor = getStatusColor(option);
-          return (
-            <TouchableOpacity
-              key={option}
-              onPress={() => onChange('status', option)}
-              style={[
-                styles.toggleButton,
-                isSelected && {
-                  backgroundColor: selectedColor,
-                  borderColor: selectedColor,
-                },
-              ]}
-            >
-              <Text
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={form.email}
+          onChangeText={(value) => onChange('email', value)}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+
+        <Text style={styles.label}>Telefone</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Telefone"
+          value={form.telefone}
+          onChangeText={(value) => onChange('telefone', maskPhone(value))}
+          keyboardType="phone-pad"
+        />
+
+        <Text style={styles.label}>Documento (CPF)</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Documento (CPF)"
+          value={form.documento}
+          onChangeText={(value) => onChange('documento', maskCpf(value))}
+          keyboardType="numeric"
+        />
+
+        <Text style={styles.sectionTitle}>Informações da Reserva</Text>
+
+        <Text style={styles.label}>Serviço</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Serviço"
+          value={form.servico}
+          onChangeText={(value) => onChange('servico', value)}
+          maxLength={50}
+        />
+
+        <Text style={styles.label}>Observações</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Observações"
+          value={form.observacoes}
+          onChangeText={(value) => onChange('observacoes', value)}
+          maxLength={50}
+        />
+
+        <Text style={styles.sectionTitle}>Status</Text>
+        <View style={styles.toggleGroup}>
+          {statusOptions.map((option) => {
+            const isSelected = form.status === option;
+            const selectedColor = getStatusColor(option);
+            return (
+              <TouchableOpacity
+                key={option}
+                onPress={() => onChange('status', option)}
                 style={[
-                  styles.toggleButtonText,
+                  styles.toggleButton,
                   isSelected && {
-                    color: ['pendente', 'expirado'].includes(option)
-                      ? '#333'
-                      : '#fff',
+                    backgroundColor: selectedColor,
+                    borderColor: selectedColor,
                   },
                 ]}
               >
-                {capitalize(option)}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-
-      <CreateReservationButton
-        title="Salvar Reserva"
-        onPress={addReservation}
-        disabled={!validateForm()}
-      />
-
-      {/* MODAL DE ALERTA */}
-      <Modal isVisible={modalVisible} onBackdropPress={() => setModalVisible(false)}>
-        <View style={modalStyles.modalContent}>
-          <Text style={modalStyles.modalText}>{modalMessage}</Text>
-          <TouchableOpacity
-            style={modalStyles.closeButton}
-            onPress={() => setModalVisible(false)}
-          >
-            <Text style={modalStyles.closeButtonText}>OK</Text>
-          </TouchableOpacity>
+                <Text
+                  style={[
+                    styles.toggleButtonText,
+                    isSelected && {
+                      color: ['pendente', 'expirado'].includes(option)
+                        ? '#333'
+                        : '#fff',
+                    },
+                  ]}
+                >
+                  {capitalize(option)}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
-      </Modal>
-    </ScrollView>
+
+        <CreateReservationButton
+          title="Salvar Reserva"
+          onPress={addReservation}
+          disabled={!validateForm()}
+        />
+
+        {/* MODAL DE ALERTA */}
+        <Modal isVisible={modalVisible} onBackdropPress={() => setModalVisible(false)}>
+          <View style={modalStyles.modalContent}>
+            <Text style={modalStyles.modalText}>{modalMessage}</Text>
+            <TouchableOpacity
+              style={modalStyles.closeButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={modalStyles.closeButtonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -209,6 +227,13 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#fff',
     flexGrow: 1,
+  },
+  label: {
+    fontSize: 14,
+    color: '#252422',
+    marginBottom: 4,
+    marginLeft: 2,
+    fontWeight: '500',
   },
   sectionTitle: {
     fontSize: 16,

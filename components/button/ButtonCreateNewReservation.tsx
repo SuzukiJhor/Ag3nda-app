@@ -22,7 +22,7 @@ export default function CreateReservationButton({ title, onPress, disabled = fal
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#EB5E28',
+    backgroundColor: '#7209b7',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',

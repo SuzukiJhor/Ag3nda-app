@@ -31,7 +31,7 @@ export default function AgendaScreen() {
       result[selected] = {
         ...(result[selected] || {}),
         selected: true,
-        selectedColor: '#EB5E28',
+        selectedColor: '#7209b7',
       };
     }
 

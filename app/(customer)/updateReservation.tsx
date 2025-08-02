@@ -10,7 +10,7 @@ import { getStatusColor } from '@/utils/statusColors';
 import { useLocalSearchParams } from 'expo-router';
 import { updateDoc } from 'firebase/firestore';
 import React from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, } from 'react-native';
 import Modal from 'react-native-modal';
 import { FormData, statusOptions } from '../types/form';
 
@@ -88,110 +88,116 @@ export default function UpdateClientScreen() {
   if (loading) return <Loading />;
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <TitleSubtitle title="Data da reserva: " />
-      <TitleSubtitle title={normalizeDate(new Date(Array.isArray(params.data) ? params.data[0] : params.data)).toLocaleDateString()} />
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={80}
+      >
+      <ScrollView contentContainerStyle={styles.container}>
+        <TitleSubtitle title="Data da reserva: " />
+        <TitleSubtitle title={normalizeDate(new Date(Array.isArray(params.data) ? params.data[0] : params.data)).toLocaleDateString()} />
 
-      <Text style={styles.sectionTitle}>Dados do Cliente</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nome completo"
-        value={form.nome}
-        onChangeText={value => onChange('nome', value)}
-        maxLength={50}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={form.email}
-        onChangeText={value => onChange('email', value)}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Telefone"
-        value={form.telefone}
-        onChangeText={value => onChange('telefone', maskPhone(value))}
-        keyboardType="phone-pad"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Documento (CPF)"
-        value={form.documento}
-        onChangeText={value => onChange('documento', maskCpf(value))}
-        keyboardType="numeric"
-      />
+        <Text style={styles.sectionTitle}>Dados do Cliente</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Nome completo"
+          value={form.nome}
+          onChangeText={value => onChange('nome', value)}
+          maxLength={50}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={form.email}
+          onChangeText={value => onChange('email', value)}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Telefone"
+          value={form.telefone}
+          onChangeText={value => onChange('telefone', maskPhone(value))}
+          keyboardType="phone-pad"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Documento (CPF)"
+          value={form.documento}
+          onChangeText={value => onChange('documento', maskCpf(value))}
+          keyboardType="numeric"
+        />
 
-      <Text style={styles.sectionTitle}>Informações da Reserva</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Serviço"
-        value={form.servico}
-        onChangeText={value => onChange('servico', value)}
-        maxLength={50}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Observações"
-        value={form.observacoes}
-        onChangeText={value => onChange('observacoes', value)}
-        maxLength={50}
-      />
+        <Text style={styles.sectionTitle}>Informações da Reserva</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Serviço"
+          value={form.servico}
+          onChangeText={value => onChange('servico', value)}
+          maxLength={50}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Observações"
+          value={form.observacoes}
+          onChangeText={value => onChange('observacoes', value)}
+          maxLength={50}
+        />
 
-       <Text style={styles.sectionTitle}>Status</Text>
-            <View style={styles.toggleGroup}>
-              {statusOptions.map(option => {
-                const isSelected = form.status === option;
-                const selectedColor = getStatusColor(option);
-                return (
-                  <TouchableOpacity
-                    key={option}
-                    onPress={() => onChange('status', option)}
-                    style={[
-                      styles.toggleButton,
-                      isSelected && {
-                        backgroundColor: selectedColor,
-                        borderColor: selectedColor,
-                      },
-                    ]}
-                  >
-                    <Text
+        <Text style={styles.sectionTitle}>Status</Text>
+              <View style={styles.toggleGroup}>
+                {statusOptions.map(option => {
+                  const isSelected = form.status === option;
+                  const selectedColor = getStatusColor(option);
+                  return (
+                    <TouchableOpacity
+                      key={option}
+                      onPress={() => onChange('status', option)}
                       style={[
-                        styles.toggleButtonText,
+                        styles.toggleButton,
                         isSelected && {
-                          color: ['pendente', 'expirado'].includes(option) ? '#333' : '#fff',
+                          backgroundColor: selectedColor,
+                          borderColor: selectedColor,
                         },
                       ]}
                     >
-                      {capitalize(option)}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
+                      <Text
+                        style={[
+                          styles.toggleButtonText,
+                          isSelected && {
+                            color: ['pendente', 'expirado'].includes(option) ? '#333' : '#fff',
+                          },
+                        ]}
+                      >
+                        {capitalize(option)}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
 
-      <CreateReservationButton
-        title="Salvar alterações"
-        onPress={handleUpdate}
-        disabled={!validateForm()}
-      />
+        <CreateReservationButton
+          title="Salvar alterações"
+          onPress={handleUpdate}
+          disabled={!validateForm()}
+        />
 
-      {/* Modal */}
-      <Modal isVisible={modalVisible}>
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalText}>{modalMessage}</Text>
-          <TouchableOpacity
-            style={styles.modalButton}
-            onPress={() => setModalVisible(false)}
-          >
-            <Text style={styles.modalButtonText}>OK</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+        {/* Modal */}
+        <Modal isVisible={modalVisible}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalText}>{modalMessage}</Text>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.modalButtonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
 
-      <View style={{ height: 8 }} />
-    </ScrollView>
+        <View style={{ height: 8 }} />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
