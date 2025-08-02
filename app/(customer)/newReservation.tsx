@@ -3,9 +3,9 @@ import { TitleSubtitle } from '@/components/button/TitleSubtitle';
 import Loading from '@/components/Loading';
 import { db } from '@/firebase';
 import { useHandleGoBack } from '@/hooks/useHandleGoBack';
+import { formatDateLocal } from '@/utils/formatDateLocal';
 import { maskCpf } from '@/utils/maskCPF';
 import { maskPhone } from '@/utils/maskPhone';
-import { normalizeDate } from '@/utils/normalizeDate';
 import { getStatusColor } from '@/utils/statusColors';
 import { useLocalSearchParams } from 'expo-router';
 import { addDoc, collection } from 'firebase/firestore';
@@ -104,8 +104,7 @@ export default function NewReservationScreen() {
     >
       <ScrollView contentContainerStyle={styles.container}>
         <TitleSubtitle title="Data da reserva: " />
-        <TitleSubtitle title={normalizeDate(new Date(data)).toLocaleDateString()} />
-
+        <TitleSubtitle title={formatDateLocal(data)} />
         <Text style={styles.sectionTitle}>Dados do Cliente</Text>
 
         <Text style={styles.label}>Nome completo</Text>

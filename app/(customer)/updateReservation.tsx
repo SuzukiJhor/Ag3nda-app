@@ -2,10 +2,10 @@ import CreateReservationButton from '@/components/button/ButtonCreateNewReservat
 import { TitleSubtitle } from '@/components/button/TitleSubtitle';
 import Loading from '@/components/Loading';
 import { useHandleGoBack } from '@/hooks/useHandleGoBack';
+import { formatDateLocal } from '@/utils/formatDateLocal';
 import { getReservaRefById } from '@/utils/getReservationRefById';
 import { maskCpf } from '@/utils/maskCPF';
 import { maskPhone } from '@/utils/maskPhone';
-import { normalizeDate } from '@/utils/normalizeDate';
 import { getStatusColor } from '@/utils/statusColors';
 import { useLocalSearchParams } from 'expo-router';
 import { updateDoc } from 'firebase/firestore';
@@ -95,8 +95,7 @@ export default function UpdateClientScreen() {
       >
       <ScrollView contentContainerStyle={styles.container}>
         <TitleSubtitle title="Data da reserva: " />
-        <TitleSubtitle title={normalizeDate(new Date(Array.isArray(params.data) ? params.data[0] : params.data)).toLocaleDateString()} />
-
+        <TitleSubtitle title={formatDateLocal(params.data)} />
         <Text style={styles.sectionTitle}>Dados do Cliente</Text>
         <TextInput
           style={styles.input}
