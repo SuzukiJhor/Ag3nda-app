@@ -1,40 +1,63 @@
-# Agenda Lá - App 👋
+# 📆 Agenda Lá
 
-## Get started
+**Agenda Lá** is a mobile application built with **React Native**, **Expo**, **Firebase**, and **Expo Router** that allows you to schedule, edit, cancel, and view customer appointments quickly and efficiently.  
+Perfect for small businesses that need a simple and organized way to manage their appointments.
 
-1. Install dependencies
+---
 
+## 🚀 Technologies Used
+
+- [React Native](https://reactnative.dev/)
+- [Expo](https://expo.dev/)
+- [Expo Router](https://expo.dev/router)
+- [Firebase Firestore](https://firebase.google.com/products/firestore)
+- [react-native-calendars](https://github.com/wix/react-native-calendars)
+- [Tamagui UI (optional)](https://tamagui.dev/)
+- [React Native Toast Message](https://github.com/calintamas/react-native-toast-message)
+- [React Native Modal](https://github.com/react-native-modal/react-native-modal)
+
+---
+
+## 📱 Features
+
+- 📅 Calendar-based date selection
+- 👤 Customer registration with:
+  - Name
+  - Phone (with masking)
+  - CPF document (masked input)
+  - Email
+- ✅ Service and notes input
+- 🟢 Reservation status:
+  - pending, confirmed, canceled, or expired
+- 📝 Edit reservations
+- ❌ Cancel reservations with visual feedback (popup)
+- 🔔 Toasts for success/error messages
+- 🔒 Secure cloud data storage using Firebase Firestore
+
+---
+
+## 📸 Screenshots
+
+
+## 🧑‍💻 How to Run the Project
+
+1. **Clone o repositório:**
    ```bash
+   git clone https://github.com/seu-usuario/agenda-la.git
+   cd agenda-la
+
+2. **Instale as dependências**
+   ````bash
    npm install
-   ```
 
-2. Start the app
+3. **Configure variaveis de ambiente**
+   ````bash
+   VITE_FIREBASE_API_KEY=...
+   VITE_FIREBASE_AUTH_DOMAIN=...
+   VITE_FIREBASE_PROJECT_ID=...
+   VITE_FIREBASE_STORAGE_BUCKET=...
+   VITE_FIREBASE_MESSAGING_SENDER_ID=...
+   VITE_FIREBASE_APP_ID=...
 
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go)
-- [use icon Father](https://feathericons.com/?query=calender)
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-<br><br>
-
-<img width="400" height="600" alt="image" src="https://github.com/user-attachments/assets/e21d0be4-8bfe-4d3e-9708-7d95328296fd" />
-
+📄 Licença
+Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
