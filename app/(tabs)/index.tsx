@@ -17,7 +17,7 @@ import logo from '../../assets/images/logo.png';
 export default function AgendaScreen() {
   const [selected] = React.useState(getTodayFormatted());
   const [reservation, setReservation] = React.useState<any[]>([]);
-  const router = useRouter();
+  const router = useRouter();  
 
   const todaySchedules = React.useMemo(() => {
     return reservation.filter(r => {
@@ -113,6 +113,7 @@ export default function AgendaScreen() {
       ) : (
         <View style={[styles.proximaReservaCard, { justifyContent: 'center', alignItems: 'center' }]}>
           <TitleSubtitle subtitle="Nenhum agendamento para hoje" />
+          <TitleSubtitle title= {formatarData(new Date())} />
         </View>
       )}
 
