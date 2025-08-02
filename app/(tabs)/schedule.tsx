@@ -83,7 +83,7 @@ export default function AgendaScreen() {
       });
 
       return () => unsubscribe();
-    }, []);
+    }, [reservas]);
 
   return (
     <View style={styles.container}>
@@ -92,8 +92,7 @@ export default function AgendaScreen() {
         onDayPress={day => setSelected(day.dateString)}
       />
 
-      <TitleSubtitle subtitle="Agendamentos do dia" />
-
+      <TitleSubtitle subtitle="Agendamentos do dia: " />
       <FlatList
         data={reservasDoDia}
         keyExtractor={item => item.id}

@@ -24,10 +24,18 @@ export default function RootLayout() {
         <Stack.Screen name="(customer)/newReservation" options={{
           headerTitle: '',
           headerShown: true,
-        }}/>
+          headerStyle: {
+            backgroundColor: '#fff',
+            },
+            headerTintColor: '#EB5E28',
+          }}/>
         <Stack.Screen name="(customer)/updateReservation" options={{
           headerTitle: '',
           headerShown: true,
+          headerStyle: {
+            backgroundColor: '#fff',
+            },
+            headerTintColor: '#EB5E28',
         }} />
         <Stack.Screen name="+not-found" />
       </Stack>

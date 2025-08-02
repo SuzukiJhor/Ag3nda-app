@@ -6,21 +6,26 @@ import { getReservaRefById } from '@/utils/getReservationRefById';
 import { maskCpf } from '@/utils/maskCPF';
 import { maskPhone } from '@/utils/maskPhone';
 import { normalizeDate } from '@/utils/normalizeDate';
+import { getStatusColor } from '@/utils/statusColors';
 import { useLocalSearchParams } from 'expo-router';
 import { updateDoc } from 'firebase/firestore';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Modal from 'react-native-modal';
 import { FormData, statusOptions } from '../types/form';
 
 export default function UpdateClientScreen() {
   const [loading, setLoading] = React.useState(false);
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [modalMessage, setModalMessage] = React.useState('');
   const handleGoBack = useHandleGoBack({ fallbackRoute: "/(tabs)" });
   const params = useLocalSearchParams();
+
   const getParamString = (param: string | string[] | undefined) => {
     if (Array.isArray(param)) return param[0] || '';
     return param || '';
   };
-   
+
   const [form, setForm] = React.useState<FormData>({
     nome: getParamString(params.nome),
     email: getParamString(params.email),
@@ -31,17 +36,19 @@ export default function UpdateClientScreen() {
     observacoes: getParamString(params.observacoes),
   });
 
+  const showModal = (message: string) => {
+    setModalMessage(message);
+    setModalVisible(true);
+  };
+
   function validateForm() {
-      if (
-        !form.nome.trim() ||
-        !form.email.trim() ||
-        !form.telefone.trim() ||
-        !form.documento.trim() ||
-        !form.status.trim()
-      ) {
-        return false;
-      }
-      return true;
+    return (
+      form.nome.trim() &&
+      form.email.trim() &&
+      form.telefone.trim() &&
+      form.documento.trim() &&
+      form.status.trim()
+    );
   }
 
   const onChange = (field: keyof typeof form, value: string) => {
@@ -49,13 +56,15 @@ export default function UpdateClientScreen() {
   };
 
   const capitalize = (text: string) =>
-  text.charAt(0).toUpperCase() + text.slice(1); 
-
+    text.charAt(0).toUpperCase() + text.slice(1);
 
   const handleUpdate = async () => {
     setLoading(true);
-    if (!validateForm()) 
-      return console.error('Por favor, preencha todos os campos obrigatórios.');
+    if (!validateForm()) {
+      showModal('Preencha todos os campos obrigatórios.');
+      setLoading(false);
+      return;
+    }
 
     const rawId = Array.isArray(params.id) ? params.id[0] : params.id;
     const idInterno = (rawId || "").trim();
@@ -63,13 +72,14 @@ export default function UpdateClientScreen() {
     try {
       const reservaRef = await getReservaRefById(idInterno);
       if (!reservaRef) {
-        alert("Reserva não encontrada com esse ID interno.");
+        showModal('Reserva não encontrada com esse ID interno.');
         return;
       }
       await updateDoc(reservaRef, { ...form });
       handleGoBack();
     } catch (err) {
       console.error("Erro ao atualizar reserva:", err);
+      showModal('Erro ao atualizar reserva.');
     } finally {
       setLoading(false);
     }
@@ -79,7 +89,7 @@ export default function UpdateClientScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <TitleSubtitle title="Data da reserva: "/>
+      <TitleSubtitle title="Data da reserva: " />
       <TitleSubtitle title={normalizeDate(new Date(Array.isArray(params.data) ? params.data[0] : params.data)).toLocaleDateString()} />
 
       <Text style={styles.sectionTitle}>Dados do Cliente</Text>
@@ -90,7 +100,7 @@ export default function UpdateClientScreen() {
         onChangeText={value => onChange('nome', value)}
         maxLength={50}
       />
-       <TextInput
+      <TextInput
         style={styles.input}
         placeholder="Email"
         value={form.email}
@@ -98,25 +108,22 @@ export default function UpdateClientScreen() {
         keyboardType="email-address"
         autoCapitalize="none"
       />
+      <TextInput
+        style={styles.input}
+        placeholder="Telefone"
+        value={form.telefone}
+        onChangeText={value => onChange('telefone', maskPhone(value))}
+        keyboardType="phone-pad"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Documento (CPF)"
+        value={form.documento}
+        onChangeText={value => onChange('documento', maskCpf(value))}
+        keyboardType="numeric"
+      />
 
-     <TextInput
-      style={styles.input}
-      placeholder="Telefone"
-      value={form.telefone}
-      onChangeText={value => onChange('telefone', maskPhone(value))}
-      keyboardType="phone-pad"
-    />
-
-    <TextInput
-      style={styles.input}
-      placeholder="Documento (CPF)"
-      value={form.documento}
-      onChangeText={value => onChange('documento', maskCpf(value))}
-      keyboardType="numeric"
-    />
-
-    <Text style={styles.sectionTitle}>Informações da Reserva</Text>
-
+      <Text style={styles.sectionTitle}>Informações da Reserva</Text>
       <TextInput
         style={styles.input}
         placeholder="Serviço"
@@ -124,39 +131,66 @@ export default function UpdateClientScreen() {
         onChangeText={value => onChange('servico', value)}
         maxLength={50}
       />
+      <TextInput
+        style={styles.input}
+        placeholder="Observações"
+        value={form.observacoes}
+        onChangeText={value => onChange('observacoes', value)}
+        maxLength={50}
+      />
 
-    <TextInput
-      style={styles.input}
-      placeholder="Observações"
-      value={form.observacoes}
-      onChangeText={value => onChange('observacoes', value)}
-      maxLength={50}
-    />
-
-     <Text style={styles.sectionTitle}>Status</Text>
-      <View style={styles.radioGroup}>
-        {statusOptions.map(option => (
-          <TouchableOpacity
-            key={option}
-            style={styles.radioButton}
-            onPress={() => onChange('status', option)}
-          >
-            <View style={styles.radioCircle}>
-              {form.status === option && <View style={styles.radioSelected} />}
+       <Text style={styles.sectionTitle}>Status</Text>
+            <View style={styles.toggleGroup}>
+              {statusOptions.map(option => {
+                const isSelected = form.status === option;
+                const selectedColor = getStatusColor(option);
+                return (
+                  <TouchableOpacity
+                    key={option}
+                    onPress={() => onChange('status', option)}
+                    style={[
+                      styles.toggleButton,
+                      isSelected && {
+                        backgroundColor: selectedColor,
+                        borderColor: selectedColor,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.toggleButtonText,
+                        isSelected && {
+                          color: ['pendente', 'expirado'].includes(option) ? '#333' : '#fff',
+                        },
+                      ]}
+                    >
+                      {capitalize(option)}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
-            <Text style={styles.radioLabel}>{capitalize(option)}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
 
-    <CreateReservationButton
+      <CreateReservationButton
         title="Salvar alterações"
         onPress={handleUpdate}
         disabled={!validateForm()}
-    />
+      />
 
-    <View style={{ height: 8 }} />
+      {/* Modal */}
+      <Modal isVisible={modalVisible}>
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalText}>{modalMessage}</Text>
+          <TouchableOpacity
+            style={styles.modalButton}
+            onPress={() => setModalVisible(false)}
+          >
+            <Text style={styles.modalButtonText}>OK</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
 
+      <View style={{ height: 8 }} />
     </ScrollView>
   );
 }
@@ -167,10 +201,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingTop: 12,
     flexGrow: 1,
-  },
-  label: {
-    fontWeight: 'bold',
-    marginBottom: 8,
   },
   sectionTitle: {
     fontSize: 16,
@@ -218,4 +248,55 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textTransform: 'capitalize',
   },
+  modalContainer: {
+    backgroundColor: '#fff',
+    padding: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  modalButton: {
+    backgroundColor: '#EB5E28',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+    toggleGroup: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginBottom: 16,
+  },
+  toggleButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    backgroundColor: '#f1f1f1',
+  },
+
+    toggleButtonSelected: {
+      backgroundColor: '#EB5E28',
+      borderColor: '#EB5E28',
+    },
+
+    toggleButtonText: {
+      fontSize: 14,
+      color: '#444',
+      fontWeight: '500',
+    },
+
+    toggleButtonTextSelected: {
+      color: '#fff',
+    }
+
 });

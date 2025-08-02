@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   iconCalendar: {
-    backgroundColor: '#403D39',
+    backgroundColor: '#007AFF',
     width: 48,
     height: 48,
     borderRadius: 10,
