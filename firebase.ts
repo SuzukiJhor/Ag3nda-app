@@ -12,7 +12,7 @@ interface FirebaseConfig {
 }
 
 const extra = Constants.expoConfig?.extra as FirebaseConfig;
-console.log('extra', extra);
+
 const firebaseConfig = {
   apiKey: extra.apiKey,
   authDomain: extra.authDomain,
