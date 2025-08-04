@@ -1,6 +1,7 @@
 import CreateReservationButton from '@/components/button/ButtonCreateNewReservation';
 import { TitleSubtitle } from '@/components/button/TitleSubtitle';
 import '@/config/calendarLocale';
+import { useAuth } from '@/context/AuthProvider';
 import { db } from '@/firebase';
 import { getTodayFormatted } from '@/utils/getTodayFormatted';
 import { normalizeDate } from '@/utils/normalizeDate';
@@ -8,6 +9,7 @@ import { formatarData, parseLocalDate } from '@/utils/parseLocalDate';
 import { getStatusColor } from '@/utils/statusColors';
 import { today } from '@/utils/todayDate';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { collection, onSnapshot } from 'firebase/firestore';
 import React from 'react';
@@ -15,9 +17,12 @@ import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react
 import logo from '../../assets/images/logo.png';
 
 export default function AgendaScreen() {
+  const { user, loading: authLoading } = useAuth();
+  const [onboarding, setOnboarding] = React.useState<boolean | null>(null);
+  const [checkingOnboarding, setCheckingOnboarding] = React.useState(true);
   const [selected] = React.useState(getTodayFormatted());
   const [reservation, setReservation] = React.useState<any[]>([]);
-  const router = useRouter();  
+  const router = useRouter();
 
   const todaySchedules = React.useMemo(() => {
     return reservation.filter(r => {
@@ -65,6 +70,33 @@ export default function AgendaScreen() {
 
     return () => unsubscribe();
   }, []);
+
+  React.useEffect(() => {
+    const checkOnboarding = async () => {
+      try {
+        const hasSeen = await AsyncStorage.getItem('hasSeenOnboarding');
+        setOnboarding(hasSeen === 'true');
+      } catch (err) {
+        console.error('Erro ao verificar onboarding:', err);
+        setOnboarding(false);
+      } finally {
+        setCheckingOnboarding(false);
+      }
+    };
+
+    checkOnboarding();
+  }, []);
+
+  if (!onboarding && !checkingOnboarding) {
+    router.push('/step1');
+    return null;
+  }
+
+  if (!user && !authLoading) {
+    router.push('/login');
+    return null;
+  }
+
 
   return (
     <View style={styles.container}>
