@@ -11,7 +11,14 @@
       "distribution": "internal",
       "channel": "preview",
       "env": {
-        "ENVIRONMENT": "preview"
+        "ENVIRONMENT": "preview",
+        "API_KEY": "$API_KEY",
+        "AUTH_DOMAIN": "$AUTH_DOMAIN",
+        "PROJECT_ID": "$PROJECT_ID",
+        "STORAGE_BUCKET": "$STORAGE_BUCKET",
+        "MESSAGING_SENDER_ID": "$MESSAGING_SENDER_ID",
+        "APP_ID": "$APP_ID",
+        "MEASUREMENT_ID": "$MEASUREMENT_ID"
       }
     }
   },
