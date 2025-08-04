@@ -1,19 +1,21 @@
 import CreateReservationButton from '@/components/button/ButtonCreateNewReservation';
 import { TitleSubtitle } from '@/components/button/TitleSubtitle';
 import '@/config/calendarLocale';
-import { db } from '@/firebase';
+import { useAuth } from '@/context/AuthProvider';
+import { listenReservasByUid } from '@/services/listenReservationByUserId';
 import { getReservaRefById } from '@/utils/getReservationRefById';
 import { useRouter } from 'expo-router';
-import { collection, onSnapshot, updateDoc } from 'firebase/firestore';
+import { updateDoc } from 'firebase/firestore';
 import React from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 
 export default function AgendaScreen() {
+  const { user, loading: authLoading } = useAuth();
   const [selected, setSelected] = React.useState('');
-  const [reservas, setReservas] = React.useState<any[]>([]);
+  const [reservation, setReservation] = React.useState<any[]>([]);
   const router = useRouter();
-  const reservasDoDia = reservas.filter(r => r.data === selected);
+  const reservasDoDia = reservation.filter(r => r.data === selected);
 
   const markedDates = React.useMemo(() => {
     const result: Record<string, {
@@ -23,7 +25,7 @@ export default function AgendaScreen() {
       selectedColor?: string;
     }> = {};
 
-    reservas.forEach(r => {
+    reservation.forEach(r => {
       result[r.data] = { marked: true, dotColor: 'red' };
     });
 
@@ -36,7 +38,7 @@ export default function AgendaScreen() {
     }
 
     return result;
-  }, [reservas, selected]);
+  }, [reservation, selected]);
 
   const getStatusStyle = (status: string) => {
     if (status === 'pendente') return styles.cardPendente;
@@ -74,16 +76,13 @@ export default function AgendaScreen() {
   };
 
     React.useEffect(() => {
-      const unsubscribe = onSnapshot(collection(db, 'reservas'), (snapshot) => {
-        const data = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setReservas(data);
-      });
-
-      return () => unsubscribe();
-    }, [reservas]);
+        if (!user) return;
+          const unsubscribe = listenReservasByUid(user.uid, (data) => {
+          setReservation(data);
+        });
+        
+        return () => unsubscribe();
+    }, [user]);
 
   return (
     <View style={styles.container}>

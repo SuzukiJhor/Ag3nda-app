@@ -2,7 +2,8 @@ import CreateReservationButton from '@/components/button/ButtonCreateNewReservat
 import { TitleSubtitle } from '@/components/button/TitleSubtitle';
 import '@/config/calendarLocale';
 import { useAuth } from '@/context/AuthProvider';
-import { db } from '@/firebase';
+import { auth } from '@/firebase';
+import { listenReservasByUid } from '@/services/listenReservationByUserId';
 import { getTodayFormatted } from '@/utils/getTodayFormatted';
 import { normalizeDate } from '@/utils/normalizeDate';
 import { formatarData, parseLocalDate } from '@/utils/parseLocalDate';
@@ -11,7 +12,7 @@ import { today } from '@/utils/todayDate';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { signOut } from 'firebase/auth';
 import React from 'react';
 import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import logo from '../../assets/images/logo.png';
@@ -59,17 +60,24 @@ export default function AgendaScreen() {
     return router.push({ pathname: '/newReservation', params: { data: selected } });
   };
 
-  React.useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, 'reservas'), (snapshot) => {
-      const data = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setReservation(data);
-    });
+  const handleLogout = async () => {
+     try {
+      await signOut(auth);
+      router.replace('/login');
+       return null;
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+    }
+  };
 
-    return () => unsubscribe();
-  }, []);
+    React.useEffect(() => {
+      if (!user) return;
+        const unsubscribe = listenReservasByUid(user.uid, (data) => {
+        setReservation(data);
+      });
+
+      return () => unsubscribe();
+    }, [user]);
 
   React.useEffect(() => {
     const checkOnboarding = async () => {
@@ -97,7 +105,6 @@ export default function AgendaScreen() {
     return null;
   }
 
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -105,7 +112,7 @@ export default function AgendaScreen() {
             source={logo}
             style={{ width: 180, height: 150, resizeMode: 'contain', alignSelf: 'flex-start' }}
           />
-        <TouchableOpacity style={styles.settingsButton} onPress={() => {}}>
+        <TouchableOpacity style={styles.settingsButton} onPress={() => {handleLogout()}}>
           <Ionicons name="settings" size={24} color="white" />
         </TouchableOpacity>
       </View>

@@ -1,24 +1,22 @@
 import CreateReservationButton from '@/components/button/ButtonCreateNewReservation';
 import { TitleSubtitle } from '@/components/button/TitleSubtitle';
-import { db } from '@/firebase';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { useAuth } from '@/context/AuthProvider';
+import { listenReservasByUid } from '@/services/listenReservationByUserId';
 import React from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 export default function ClientesScreen() {
     const [reservas, setReservas] = React.useState<any[]>([]);
-  
+    const { user } = useAuth();
+
     React.useEffect(() => {
-      const unsubscribe = onSnapshot(collection(db, 'reservas'), (snapshot) => {
-        const data = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+      if (!user) return;
+        const unsubscribe = listenReservasByUid(user.uid, (data) => {
         setReservas(data);
-        });
-  
+      });
+      
       return () => unsubscribe();
-    }, []);
+    }, [user]);
 
   return (
     <View style={styles.container}>

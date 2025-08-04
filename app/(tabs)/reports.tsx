@@ -1,25 +1,24 @@
 import { TitleSubtitle } from '@/components/button/TitleSubtitle';
-import { db } from '@/firebase';
+import { useAuth } from '@/context/AuthProvider';
+import { listenReservasByUid } from '@/services/listenReservationByUserId';
 import { normalizeDate } from '@/utils/normalizeDate';
-import { collection, onSnapshot } from 'firebase/firestore';
 import React from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 
 export default function RelatoriosScreen() {
   const [reservas, setReservas] = React.useState<any[]>([]);
+  const { user } = useAuth();
 
-    React.useEffect(() => {
-      const unsubscribe = onSnapshot(collection(db, 'reservas'), (snapshot) => {
-        const data = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setReservas(data);
-        });
-  
-      return () => unsubscribe();
-    }, []);
+  React.useEffect(() => {
+    if (!user) return;
+      const unsubscribe = listenReservasByUid(user.uid, (data) => {
+      setReservas(data);
+    });
+    
+    return () => unsubscribe();
+  }, [user]);
+
   return (
     <View style={styles.container}>
       <TitleSubtitle title="Atendimentos" />

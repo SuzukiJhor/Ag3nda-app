@@ -61,6 +61,14 @@ export default function RootLayout() {
                   },
                 headerTintColor: '#EB5E28',
               }} />
+              <Stack.Screen name="(auth)/login" options={{
+                headerTitle: '',
+                headerShown: false,
+                headerStyle: {
+                  backgroundColor: '#fff',
+                  },
+                headerTintColor: '#EB5E28',
+              }} />
               <Stack.Screen name="+not-found" />
             </Stack>
         <StatusBar style="auto" />

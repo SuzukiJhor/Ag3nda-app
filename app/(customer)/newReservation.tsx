@@ -8,6 +8,7 @@ import { maskCpf } from '@/utils/maskCPF';
 import { maskPhone } from '@/utils/maskPhone';
 import { getStatusColor } from '@/utils/statusColors';
 import { useLocalSearchParams } from 'expo-router';
+import { getAuth } from 'firebase/auth';
 import { addDoc, collection } from 'firebase/firestore';
 import React from 'react';
 import {
@@ -29,7 +30,7 @@ export default function NewReservationScreen() {
   const [loading, setLoading] = React.useState(false);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [modalMessage, setModalMessage] = React.useState('');
-
+  const auth = getAuth();
   const [form, setForm] = React.useState<FormData>({
     nome: '',
     email: '',
@@ -66,9 +67,18 @@ export default function NewReservationScreen() {
     }
 
     setLoading(true);
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      alert('Usuário não autenticado.');
+      setLoading(false);
+      return;
+    }
+
+    const uid = currentUser.uid;
 
     const newReservation = {
       id: Date.now().toString(),
+      uid,
       data,
       ...form,
     };

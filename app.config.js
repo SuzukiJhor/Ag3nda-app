@@ -6,7 +6,7 @@ export default {
     slug: "agendaApp",
     version: "1.0.3",
     orientation: "portrait",
-    icon: "./assets/images/1024.png",
+    icon: "./assets/images/imageLogin.png",
     scheme: "agendaapp",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,

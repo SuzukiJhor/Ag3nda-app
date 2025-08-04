@@ -1,10 +1,13 @@
+import { useAuth } from '@/context/AuthProvider';
 import { auth } from "@/firebase";
+import { router } from "expo-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import React from "react";
 import { Alert, Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import imageLogin from '../../assets/images/imageLogin.png';
 
 export default function Login() {
+  const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = React.useState(false);
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -18,7 +21,8 @@ export default function Login() {
 
     try {
       await signInWithEmailAndPassword(auth, email.trim(), password.trim());
-      Alert.alert('Sucesso', 'Login realizado com sucesso');
+      router.replace('/');
+      return null;
     } catch (error: any) {
       console.error('Erro de login:', error.message);
       Alert.alert('Erro', 'Email ou senha inválidos');
@@ -27,19 +31,29 @@ export default function Login() {
     }
   };
 
+  React.useEffect(() => {
+      if (user && !authLoading) {
+        router.push('/');
+      }
+  }, [authLoading, user]);
+
  return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.select({ ios: 'padding', android: undefined })}
     >
-      <View style={styles.form}>
-       
-       <View style={styles.header}>
-          <Text style={styles.title}>{'Bem-vindo'}</Text>
+       <View style={styles.logoContainer}>
           <Image
             source={imageLogin}
             style={styles.logo}
           />
+       </View>
+      <View style={styles.form}>
+      
+      <Text style={styles.title}>{'Login'}</Text>
+
+       <View style={styles.header}>
+       
         </View>
         <Text style={styles.label}>Usuário</Text>
         <TextInput
@@ -132,5 +146,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#7209b7',
     textAlign: 'center',
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 24,
+    marginTop: 0,
   },
 });
