@@ -7,14 +7,15 @@ import { getReservaRefById } from '@/services/getReservationRefById';
 import { useRouter } from 'expo-router';
 import { updateDoc } from 'firebase/firestore';
 import React from 'react';
-import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 
 export default function AgendaScreen() {
-  const [selected, setSelected] = React.useState('');
+  const [ selected, setSelected ] = React.useState('');
   const {reservations: reservation, loading} = useReservation();
   const router = useRouter();
   const reservasDoDia = reservation.filter(r => r.data === selected);
+  const [ loadingCancelReservation, setLoadingCancelReservation ] = React.useState(false);
 
   const markedDates = React.useMemo(() => {
     const result: Record<string, {
@@ -47,6 +48,7 @@ export default function AgendaScreen() {
   };
 
   const handleCancelReservation = async (id: string) => {
+    setLoadingCancelReservation(true)
     if (!id) return;
 
     try {
@@ -59,6 +61,8 @@ export default function AgendaScreen() {
     } catch (err) {
       console.error("Erro ao cancelar reserva:", err);
       Alert.alert("Erro ao cancelar reserva!");
+    } finally {
+      setLoadingCancelReservation(false);
     }
   };
 
@@ -88,26 +92,32 @@ export default function AgendaScreen() {
         data={reservasDoDia}
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
-          <View style={[styles.card, getStatusStyle(item.status), styles.cardRow]}>
-            <TouchableOpacity
-              style={styles.cardContent}
-              onPress={() => handleEditReservation(item)}
-            >
-              <Text>{item.nome}</Text>
-              <Text>{item.telefone}</Text>
-              <Text>{item.status}</Text>
-            </TouchableOpacity>
-
-          {item.status !== 'cancelado' && (
-              <TouchableOpacity 
-                onPress={() => handleCancelReservation(item.id)} 
-                style={styles.buttonCancel}
+          loadingCancelReservation && item.status !== 'cancelado' ? (
+            <View style={{ alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+              <ActivityIndicator size="small" color="#EB5E28" />
+            </View>
+            
+          ) : (
+            <View style={[styles.card, getStatusStyle(item.status), styles.cardRow]}>
+              <TouchableOpacity
+                style={styles.cardContent}
+                onPress={() => handleEditReservation(item)}
               >
-                <Text style={{ color: 'red', fontSize: 14 }}>Cancelar</Text>
+                <Text>{item.nome}</Text>
+                <Text>{item.telefone}</Text>
+                <Text>{item.status}</Text>
               </TouchableOpacity>
-            )}
 
-          </View>
+              {item.status !== 'cancelado' && (
+                <TouchableOpacity 
+                  onPress={() => handleCancelReservation(item.id)} 
+                  style={styles.buttonCancel}
+                >
+                  <Text style={{ color: 'red', fontSize: 14 }}>Cancelar</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )
         )}
 
         ListEmptyComponent={

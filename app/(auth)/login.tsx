@@ -1,5 +1,6 @@
 import { useAuth } from '@/context/AuthProvider';
 import { auth } from "@/firebase";
+import { Ionicons } from '@expo/vector-icons';
 import { router } from "expo-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import React from "react";
@@ -11,6 +12,7 @@ export default function Login() {
   const [loading, setLoading] = React.useState(false);
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -67,13 +69,24 @@ export default function Login() {
         />
 
         <Text style={styles.label}>Senha</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Digite sua senha"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
+       <View style={styles.passwordContainer}>
+          <TextInput
+            style={[styles.input, { flex: 1 }]}
+            placeholder="Digite sua senha"
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}
+          />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <Ionicons
+              name={showPassword ? 'eye-off' : 'eye'}
+              size={24}
+              color="#555"
+              style={{ paddingHorizontal: 8, marginBottom: 15 }}
+            />
+          </TouchableOpacity>
+        </View>
+
 
         <TouchableOpacity
           style={[styles.button, loading && { opacity: 0.5 }]}
@@ -112,9 +125,9 @@ const styles = StyleSheet.create({
     color: '#252422',
   },
   input: {
-    borderWidth: 1,
+    // borderWidth: 1,
     borderColor: '#ccc',
-    padding: 12,
+    padding: 8,
     marginBottom: 16,
     borderRadius: 8,
     backgroundColor: '#f9f9f9',
@@ -152,5 +165,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
     marginTop: 0,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    // borderWidth: 1,
+    // borderColor: '#ccc',
+    // borderRadius: 8,
+    // backgroundColor: '#f9f9f9',
+    marginBottom: 16,
   },
 });
