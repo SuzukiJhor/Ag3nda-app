@@ -9,13 +9,13 @@ export default function Step2() {
 
   function handleNextStep() {
       router.push('/step3')
-      return null;
+      return;
   }
 
   async function handleSkip() {
       await AsyncStorage.setItem('hasSeenOnboarding', 'true');
       router.replace('/');
-      return null;
+      return;
   }
 
   return (
@@ -44,10 +44,35 @@ export default function Step2() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', padding: 24, justifyContent: 'center' },
-  logo: { width: 160, height: 100, resizeMode: 'contain', alignSelf: 'center', marginBottom: 32 },
-  title: { fontSize: 24, fontWeight: 'bold', color: '#7209b7', textAlign: 'center' },
-  subtitle: { fontSize: 16, textAlign: 'center', marginVertical: 16, color: '#403D39' },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 24,
+    justifyContent: 'center',
+  },
+
+  logo: {
+    width: 160,
+    height: 100,
+    resizeMode: 'contain',
+    alignSelf: 'center',
+    marginBottom: 32,
+  },
+
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#7209b7',
+    textAlign: 'center',
+  },
+
+  subtitle: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginVertical: 16,
+    color: '#403D39',
+  },
+
   card: {
     backgroundColor: '#f3f0ff',
     borderRadius: 12,
@@ -55,15 +80,37 @@ const styles = StyleSheet.create({
     marginVertical: 24,
     alignItems: 'center',
   },
-  cardText: { marginTop: 12, fontSize: 16, color: '#403D39', textAlign: 'center' },
+
+  cardText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#403D39',
+    textAlign: 'center',
+  },
+
   button: {
     backgroundColor: '#7209b7',
     padding: 14,
-    borderRadius: 12, 
+    borderRadius: 12,
     paddingHorizontal: 45,
     alignItems: 'center',
   },
-  skipButton: { marginTop: 16, alignItems: 'center' },
-  skipText: { color: '#7209b7', fontSize: 16, textDecorationLine: 'underline' },
-  buttonText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
+
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+
+  skipButton: {
+    marginTop: 16,
+    alignItems: 'center',
+  },
+
+  skipText: {
+    color: '#7209b7',
+    fontSize: 16,
+    textDecorationLine: 'underline',
+  },
 });
+

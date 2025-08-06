@@ -1,5 +1,3 @@
-// app/(onboarding)/step3.tsx
-
 import { useRouter } from 'expo-router';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -8,16 +6,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function Step3() {
   const router = useRouter();
 
-    const handleFinish = async () => {
-        await AsyncStorage.setItem('hasSeenOnboarding', 'true');
-        router.replace('/');
-    };
+  const handleFinish = async () => {
+      await AsyncStorage.setItem('hasSeenOnboarding', 'true');
+      router.replace('/');
+      return;
+  };
 
-    async function handleSkip() {
-        await AsyncStorage.setItem('hasSeenOnboarding', 'true');
-        router.replace('/');
-        return null;
-    }
+  async function handleSkip() {
+      await AsyncStorage.setItem('hasSeenOnboarding', 'true');
+      router.replace('/');
+      return;
+  }
 
   return (
     <View style={styles.container}>
@@ -31,7 +30,7 @@ export default function Step3() {
         Você pode editar ou cancelar reservas diretamente pela lista.
       </Text>
       <Text style={styles.description}>
-        Use o botão "+ Nova Reserva" para adicionar uma nova reserva na data selecionada.
+        Use o botão &quot;+ Nova Reserva&quot; para adicionar uma nova reserva na data selecionada.
       </Text>
 
       <TouchableOpacity onPress={handleFinish} style={styles.button}>
@@ -54,8 +53,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: 32,
     color: '#7209b7',
+    marginLeft: '15%',
   },
   description: {
     fontSize: 16,

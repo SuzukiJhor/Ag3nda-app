@@ -2,8 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
 
 export function useOnboarding() {
-  const [onboarding, setOnboarding] = React.useState<boolean | null>(null);
-  const [checkingOnboarding, setCheckingOnboarding] = React.useState(true);
+  const [ onboarding, setOnboarding ] = React.useState<boolean | null>(null);
+  const [ checkingOnboarding, setCheckingOnboarding ] = React.useState(true);
 
   React.useEffect(() => {
     const checkOnboarding = async () => {

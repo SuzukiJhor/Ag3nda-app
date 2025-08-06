@@ -6,13 +6,13 @@ import React from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 export default function ClientesScreen() {
-    const [reservas, setReservas] = React.useState<any[]>([]);
+    const [ reservations, setReservations ] = React.useState<any[]>([]);
     const { user } = useAuth();
 
     React.useEffect(() => {
       if (!user) return;
         const unsubscribe = listenReservasByUid(user.uid, (data) => {
-        setReservas(data);
+        setReservations(data);
       });
       
       return () => unsubscribe();
@@ -22,7 +22,7 @@ export default function ClientesScreen() {
     <View style={styles.container}>
       <TitleSubtitle title="Reservas"/>
       <FlatList
-        data={reservas}
+        data={reservations}
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
           <View style={styles.card}>
@@ -44,11 +44,38 @@ export default function ClientesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fff', paddingTop: 32 },
-  card: { backgroundColor: '#f1f1f1', padding: 16, borderRadius: 8, marginBottom: 12, marginTop: 12 },
-  nome: { fontSize: 18, fontWeight: '600' },
-  info: { fontSize: 14, color: '#555', marginTop: 4 },
-  empty: { textAlign: 'center', color: '#aaa', marginTop: 32 },
+  container: {
+    flex: 1,
+    padding: 20,
+    paddingTop: 32,
+    backgroundColor: '#fff',
+  },
+
+  card: {
+    backgroundColor: '#f1f1f1',
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 12,
+    marginTop: 12,
+  },
+
+  nome: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+
+  info: {
+    fontSize: 14,
+    color: '#555',
+    marginTop: 4,
+  },
+
+  empty: {
+    textAlign: 'center',
+    color: '#aaa',
+    marginTop: 32,
+  },
+
   button: {
     backgroundColor: '#007AFF',
     padding: 16,
@@ -56,5 +83,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 16,
   },
-  buttonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
 });
