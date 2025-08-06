@@ -1,9 +1,10 @@
 import CreateReservationButton from '@/components/button/ButtonCreateNewReservation';
 import { TitleSubtitle } from '@/components/button/TitleSubtitle';
+import Loading from '@/components/Loading';
 import '@/config/calendarLocale';
 import { useAuth } from '@/context/AuthProvider';
+import { useReservation } from '@/context/ReservationProvider';
 import { auth } from '@/firebase';
-import { listenReservasByUid } from '@/services/listenReservationByUserId';
 import { getTodayFormatted } from '@/utils/getTodayFormatted';
 import { normalizeDate } from '@/utils/normalizeDate';
 import { formatarData, parseLocalDate } from '@/utils/parseLocalDate';
@@ -18,13 +19,13 @@ import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react
 import logo from '../../assets/images/logo.png';
 
 export default function AgendaScreen() {
-  const { user, loading: authLoading } = useAuth();
   const [onboarding, setOnboarding] = React.useState<boolean | null>(null);
   const [checkingOnboarding, setCheckingOnboarding] = React.useState(true);
   const [selected] = React.useState(getTodayFormatted());
-  const [reservation, setReservation] = React.useState<any[]>([]);
+  const {reservations: reservation, loading} = useReservation();
   const router = useRouter();
-
+  const { user, loading: authLoading } = useAuth();
+  
   const todaySchedules = React.useMemo(() => {
     return reservation.filter(r => {
       const reservaDate = parseLocalDate(r.data);
@@ -70,15 +71,6 @@ export default function AgendaScreen() {
     }
   };
 
-    React.useEffect(() => {
-      if (!user) return;
-        const unsubscribe = listenReservasByUid(user.uid, (data) => {
-        setReservation(data);
-      });
-
-      return () => unsubscribe();
-    }, [user]);
-
   React.useEffect(() => {
     const checkOnboarding = async () => {
       try {
@@ -104,6 +96,8 @@ export default function AgendaScreen() {
     router.push('/login');
     return null;
   }
+
+  if (loading) return <Loading />;
 
   return (
     <View style={styles.container}>

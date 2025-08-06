@@ -23,7 +23,7 @@ export default function Step1() {
         source={imageLogin}
         style={styles.logo}
         />
-      <Text style={styles.title}>Bem-vindo ao app AgendaLá!</Text>
+      <Text style={styles.title}>Bem-vindo</Text>
       <Text style={styles.subtitle}>Aqui você pode agendar facilmente suas reservas.</Text>
       <TouchableOpacity style={styles.button} onPress={()=>{handleNextStep()}}>
         <Text style={styles.buttonText}>Começar</Text>
