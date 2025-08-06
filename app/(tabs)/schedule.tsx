@@ -1,19 +1,18 @@
 import CreateReservationButton from '@/components/button/ButtonCreateNewReservation';
 import { TitleSubtitle } from '@/components/button/TitleSubtitle';
+import Loading from '@/components/Loading';
 import '@/config/calendarLocale';
-import { useAuth } from '@/context/AuthProvider';
-import { listenReservasByUid } from '@/services/listenReservationByUserId';
-import { getReservaRefById } from '@/utils/getReservationRefById';
+import { useReservation } from '@/context/ReservationProvider';
+import { getReservaRefById } from '@/services/getReservationRefById';
 import { useRouter } from 'expo-router';
 import { updateDoc } from 'firebase/firestore';
 import React from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 
 export default function AgendaScreen() {
-  const { user, loading: authLoading } = useAuth();
   const [selected, setSelected] = React.useState('');
-  const [reservation, setReservation] = React.useState<any[]>([]);
+  const {reservations: reservation, loading} = useReservation();
   const router = useRouter();
   const reservasDoDia = reservation.filter(r => r.data === selected);
 
@@ -53,13 +52,13 @@ export default function AgendaScreen() {
     try {
       const reservationRef = await getReservaRefById(id);
       if (!reservationRef) {
-        alert("Reserva não encontrada com esse ID interno.");
+        Alert.alert("Reserva não encontrada com esse ID interno.");
         return;
       }
       await updateDoc(reservationRef, { status: "cancelado" });
     } catch (err) {
       console.error("Erro ao cancelar reserva:", err);
-      alert("Erro ao cancelar reserva!");
+      Alert.alert("Erro ao cancelar reserva!");
     }
   };
 
@@ -75,14 +74,7 @@ export default function AgendaScreen() {
     return router.push({ pathname: '/newReservation', params: { data: selected } });
   };
 
-    React.useEffect(() => {
-        if (!user) return;
-          const unsubscribe = listenReservasByUid(user.uid, (data) => {
-          setReservation(data);
-        });
-        
-        return () => unsubscribe();
-    }, [user]);
+  if (loading) return <Loading />;
 
   return (
     <View style={styles.container}>
