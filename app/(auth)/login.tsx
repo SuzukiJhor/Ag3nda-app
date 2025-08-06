@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
   },
   button: {
-    backgroundColor: '#EB5E28',
+    backgroundColor: '#7209b7',
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#7209b7',
+    color: '#EB5E28', 
     textAlign: 'center',
   },
   logoContainer: {
