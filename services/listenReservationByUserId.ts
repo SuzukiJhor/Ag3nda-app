@@ -12,7 +12,7 @@ export function listenReservasByUid(
   callback: (reservas: any[]) => void
 ) {
   const reservasRef = collection(db, "reservas");
-  const q = query(reservasRef, where("uid", "==", uid));
+  const q = query(reservasRef, where("userId", "==", uid));
 
   const unsubscribe = onSnapshot(q, (snapshot) => {
     const data = snapshot.docs.map((doc) => ({
