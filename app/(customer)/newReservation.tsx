@@ -12,6 +12,7 @@ import { getAuth } from 'firebase/auth';
 import { addDoc, collection } from 'firebase/firestore';
 import React from 'react';
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -69,16 +70,16 @@ export default function NewReservationScreen() {
     setLoading(true);
     const currentUser = auth.currentUser;
     if (!currentUser) {
-      alert('Usuário não autenticado.');
+      Alert.alert('Usuário não autenticado.');
       setLoading(false);
       return;
     }
 
-    const uid = currentUser.uid;
+    const userId = currentUser.uid;
 
     const newReservation = {
       id: Date.now().toString(),
-      uid,
+      userId,
       data,
       ...form,
     };
