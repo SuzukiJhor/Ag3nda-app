@@ -38,6 +38,9 @@ Perfect for small businesses that need a simple and organized way to manage thei
 
 ## 📸 Screenshots
 
+<img width="256" height="384" alt="image" src="https://github.com/user-attachments/assets/8944ce47-2ada-4aef-ab3c-f5a90b5c532d" />
+
+
 
 ## 🧑‍💻 How to Run the Project
 
