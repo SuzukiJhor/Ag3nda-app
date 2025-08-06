@@ -33,13 +33,17 @@ export const ReservationProvider = ({ children }: { children: React.ReactNode })
       setLoading(false);
       return;
     }
+
+    setLoading(true);
+
     const unsubscribe = listenReservasByUid(user.uid, (data) => {
       setReservations(data);
       setLoading(false);
     });
-           
+
     return () => unsubscribe();
-  }, [user, reservations]);
+  }, [user]);
+
 
   return (
     <ReservationContext.Provider value={{ reservations, loading }}>
