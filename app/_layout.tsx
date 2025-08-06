@@ -19,6 +19,7 @@ function ProtectedLayout() {
     if (!loading) {
       if (!user && !inAuthGroup) {
         router.replace('/login');
+        return;
       }
     }
   }, [user, loading, segments, router]);

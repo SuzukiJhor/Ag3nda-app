@@ -34,6 +34,7 @@ export default function Login() {
   React.useEffect(() => {
       if (user && !authLoading) {
         router.push('/');
+        return;
       }
   }, [authLoading, user]);
 

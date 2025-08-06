@@ -5,13 +5,13 @@ import '@/config/calendarLocale';
 import { useAuth } from '@/context/AuthProvider';
 import { useReservation } from '@/context/ReservationProvider';
 import { auth } from '@/firebase';
+import { useOnboarding } from '@/hooks/useOnboarding';
 import { getTodayFormatted } from '@/utils/getTodayFormatted';
 import { normalizeDate } from '@/utils/normalizeDate';
 import { formatarData, parseLocalDate } from '@/utils/parseLocalDate';
 import { getStatusColor } from '@/utils/statusColors';
 import { today } from '@/utils/todayDate';
 import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { signOut } from 'firebase/auth';
 import React from 'react';
@@ -19,19 +19,18 @@ import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react
 import logo from '../../assets/images/logo.png';
 
 export default function AgendaScreen() {
-  const [onboarding, setOnboarding] = React.useState<boolean | null>(null);
-  const [checkingOnboarding, setCheckingOnboarding] = React.useState(true);
-  const [selected] = React.useState(getTodayFormatted());
-  const {reservations: reservation, loading} = useReservation();
-  const router = useRouter();
+  const [ selected ] = React.useState(getTodayFormatted());
+  const { onboarding, checkingOnboarding } = useOnboarding();
+  const { reservations, loading } = useReservation();
   const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
   
   const todaySchedules = React.useMemo(() => {
-    return reservation.filter(r => {
+    return reservations.filter(r => {
       const reservaDate = parseLocalDate(r.data);
       return normalizeDate(reservaDate).getTime() === today.getTime();
     });
-  }, [reservation]);
+  }, [reservations]);
 
   const nextDates = React.useMemo(() => {
     const dias = [];
@@ -39,14 +38,14 @@ export default function AgendaScreen() {
       const d = new Date(today);
       d.setDate(today.getDate() + i);
       const dataStr = d.toISOString().slice(0, 10);
-     const reservationsOnTheDay = reservation.filter(r => r.data === dataStr && r.status !== 'cancelado' && r.status !== 'expirado'); 
+     const reservationsOnTheDay = reservations.filter(r => r.data === dataStr && r.status !== 'cancelado' && r.status !== 'expirado'); 
       dias.push({
         data: d,
         status: reservationsOnTheDay.length > 0 ? 'Ocupado' : 'Livre',
       });
     }
     return dias;
-  }, [reservation]);
+  }, [reservations]);
 
   const handleEditReservation = (item: any) => {
     if (!item) return;
@@ -57,45 +56,33 @@ export default function AgendaScreen() {
   };
 
   const handleAddReservation = () => {
-     if (!selected) return;
+    if (!selected) return;
     return router.push({ pathname: '/newReservation', params: { data: selected } });
   };
 
   const handleLogout = async () => {
      try {
-      await signOut(auth);
-      router.replace('/login');
-       return null;
+        await signOut(auth);
+        router.replace('/login');
+        return null;
     } catch (error) {
-      console.error("Erro ao fazer logout:", error);
+        console.error("Erro ao fazer logout:", error);
     }
   };
 
   React.useEffect(() => {
-    const checkOnboarding = async () => {
-      try {
-        const hasSeen = await AsyncStorage.getItem('hasSeenOnboarding');
-        setOnboarding(hasSeen === 'true');
-      } catch (err) {
-        console.error('Erro ao verificar onboarding:', err);
-        setOnboarding(false);
-      } finally {
-        setCheckingOnboarding(false);
-      }
-    };
+    if (!checkingOnboarding && !onboarding) {
+      router.replace('/step1');
+      return;
+    }
+  }, [checkingOnboarding, onboarding, router]);
 
-    checkOnboarding();
-  }, []);
-
-  if (!onboarding && !checkingOnboarding) {
-    router.push('/step1');
-    return null;
-  }
-
-  if (!user && !authLoading) {
-    router.push('/login');
-    return null;
-  }
+  React.useEffect(() => {
+    if (!authLoading && !user) {
+      router.replace('/login');
+      return;
+    }
+  }, [authLoading, user, router]);
 
   if (loading) return <Loading />;
 
@@ -174,13 +161,26 @@ export default function AgendaScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: '#fff', paddingTop: 4 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+  container: {
+    flex: 1,
+    padding: 16,
+    paddingTop: 4,
+    backgroundColor: '#fff',
+  },
+
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+
   settingsButton: {
     backgroundColor: '#7209b7',
     padding: 8,
     borderRadius: 20,
   },
+
   proximaReservaCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
@@ -192,6 +192,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     elevation: 3,
   },
+
   proximaReservaRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -199,15 +200,18 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginTop: 12,
   },
+
   nomeReserva: {
     fontWeight: 'bold',
     fontSize: 20,
     color: '#403D39',
   },
+
   dataReserva: {
     color: '#252422',
     marginTop: 4,
   },
+
   iconCalendar: {
     backgroundColor: '#EB5E28',
     width: 48,
@@ -216,17 +220,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   iconCalendarText: {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 18,
   },
+
   proximasDatasCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 16,
   },
+
   dataStatusRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -234,6 +241,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: '#ddd',
   },
+
   faixaCancelado: {
     backgroundColor: '#ff4d4d',
     paddingVertical: 4,
@@ -242,10 +250,10 @@ const styles = StyleSheet.create({
     marginTop: 6,
     alignSelf: 'flex-start',
   },
+
   textoCancelado: {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 12,
   },
-
 });
