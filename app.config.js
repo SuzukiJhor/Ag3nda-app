@@ -11,6 +11,7 @@ export default {
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
     android: {
+      googleServicesFile: "./google-services.json",
       package: "com.jhordan.agendala",
       adaptiveIcon: {
         foregroundImage: "./assets/images/adaptive-icon.png",
@@ -38,6 +39,14 @@ export default {
           imageWidth: 200,
           resizeMode: "contain",
           backgroundColor: "#ffffff"
+        }
+      ],
+       [
+        "expo-build-properties",
+        {
+          android: {
+            googleServicesFile: "./google-services.json"
+          }
         }
       ]
     ],

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "600695293831",
+    "project_id": "agendala-68714",
+    "storage_bucket": "agendala-68714.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:600695293831:android:acb59ab88e7c4a13837522",
+        "android_client_info": {
+          "package_name": "com.jhordan.agendala"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9xbM-yLj8GRuRSede2htk5uyylR4NOro"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
