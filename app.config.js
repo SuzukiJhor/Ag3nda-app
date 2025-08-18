@@ -10,6 +10,9 @@ export default {
     scheme: "agendaapp",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
+    assetBundlePatterns: [
+      "assets/fonts/*"
+    ],
     android: {
       googleServicesFile: "./google-services.json",
       package: "com.jhordan.agendala",

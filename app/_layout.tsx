@@ -7,6 +7,7 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import 'react-native-reanimated';
+import './styles/fonts.css';
 
 function ProtectedLayout() {
   const { user, loading } = useAuth();

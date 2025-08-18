@@ -11,7 +11,7 @@
       "distribution": "internal",
       "channel": "preview",
       "env": {
-        "ENVIRONMENT": "preview",
+        "ENVIRONMENT": "production",
         "API_KEY": "$API_KEY",
         "AUTH_DOMAIN": "$AUTH_DOMAIN",
         "PROJECT_ID": "$PROJECT_ID",
