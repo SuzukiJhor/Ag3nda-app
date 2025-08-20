@@ -20,6 +20,23 @@
         "APP_ID": "$APP_ID",
         "MEASUREMENT_ID": "$MEASUREMENT_ID"
       }
+    },
+    "production": {
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "distribution": "store",
+      "channel": "production",
+      "env": {
+        "ENVIRONMENT": "production",
+        "API_KEY": "$API_KEY",
+        "AUTH_DOMAIN": "$AUTH_DOMAIN",
+        "PROJECT_ID": "$PROJECT_ID",
+        "STORAGE_BUCKET": "$STORAGE_BUCKET",
+        "MESSAGING_SENDER_ID": "$MESSAGING_SENDER_ID",
+        "APP_ID": "$APP_ID",
+        "MEASUREMENT_ID": "$MEASUREMENT_ID"
+      }
     }
   },
   "submit": {
