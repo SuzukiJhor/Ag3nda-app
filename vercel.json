@@ -1,6 +1,7 @@
 {
   "buildCommand": "expo export -p web",
   "devCommand": "expo",
+  "outputDirectory": "dist/client",
   "cleanUrls": true,
   "framework": null,
   "rewrites": [
