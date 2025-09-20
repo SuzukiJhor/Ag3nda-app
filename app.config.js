@@ -15,7 +15,7 @@ export default {
     ],
     android: {
       googleServicesFile: "./google-services.json",
-      package: "com.jhordan.agendala",
+      package: "com.suzuki.agendaLA",
       adaptiveIcon: {
         foregroundImage: "./assets/images/adaptive-icon.png",
         backgroundColor: "#ffffff"
