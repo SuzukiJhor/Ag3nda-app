@@ -9,6 +9,7 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "build:web": "rm -rf dist && npx expo export -p web",
+    "vercel-build": "rm -rf dist && npx expo export -p web",
     "lint": "expo lint"
   },
   "dependencies": {
